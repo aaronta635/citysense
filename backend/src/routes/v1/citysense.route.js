@@ -105,4 +105,15 @@ router.get('/suburbs/stats', citysenseController.getSuburbMoodStats);
  */
 router.get('/analyze', citysenseController.analyzeCity);
 
+/**
+ * @swagger
+ * /citysense/analyze/all:
+ *   get:
+ *     summary: Run AI analysis for all suburbs (weather + pollution + moods)
+ *     responses:
+ *       200:
+ *         description: AI analysis results for all suburbs
+ */
+router.get('/analyze/all', citysenseController.analyzeAll);
+
 module.exports = router;

@@ -1,9 +1,0 @@
-{
-  "weather": { "temperature": 22, "is_rain": false },
-  "air": { "pm25": 35, "pm25_category": "moderate" },
-  "moods": [
-    { "district": "Sydney CBD", "message": "Trains are delayed again 😡", "timestamp": "2025-08-30 08:15" },
-    { "district": "Bondi", "message": "Too many garbage on the beach", "timestamp": "2025-08-30 12:00" },
-    { "district": "Chatswood", "message": "So happy with the new bike lanes 🚲", "timestamp": "2025-08-30 09:45" }
-  ]
-}
