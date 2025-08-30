@@ -1,0 +1,214 @@
+diff --git a/backend/src/app.js b/backend/src/app.js
+index e29b9ad5..3e665eca 100644
+--- a/backend/src/app.js
++++ b/backend/src/app.js
+@@ -7,12 +7,12 @@ const morgan = require('./config/morgan');
+ const routes = require('./routes/v1');
+ const { errorConverter, errorHandler } = require('./middlewares/error');
+ const ApiError = require('./utils/ApiError');
+-const mongoose = require('mongoose');
++// const mongoose = require('mongoose');
+ 
+ 
+-mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
+-  console.log('Connected to MongoDB');
+-});
++// mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
++//   console.log('Connected to MongoDB');
++// });
+ const app = express();
+ 
+ if (config.env !== 'test') {
+diff --git a/backend/src/middlewares/error.js b/backend/src/middlewares/error.js
+index df14e916..9f1abe92 100644
+--- a/backend/src/middlewares/error.js
++++ b/backend/src/middlewares/error.js
+@@ -1,4 +1,4 @@
+-const mongoose = require('mongoose');
++//const mongoose = require('mongoose');
+ const httpStatus = require('http-status');
+ const config = require('../config/config');
+ const logger = require('../config/logger');
+diff --git a/backend/src/models/userMood.model.js b/backend/src/models/userMood.model.js
+index dcc969fd..b1d3b058 100644
+--- a/backend/src/models/userMood.model.js
++++ b/backend/src/models/userMood.model.js
+@@ -1,34 +1,34 @@
+-const mongoose = require('mongoose');
++// const mongoose = require('mongoose');
+ 
+-const userMoodSchema = mongoose.Schema({
+-    suburbs: {
+-        type: String,
+-        required: true
+-    },
++// const userMoodSchema = mongoose.Schema({
++//     suburbs: {
++//         type: String,
++//         required: true
++//     },
+ 
+-    user_mood: {
+-        type: String, 
+-        enum: ['Happy', 'Neutral', 'Stressed', 'Angry', 'Sad'],
+-        required: true
+-    },
++//     user_mood: {
++//         type: String, 
++//         enum: ['Happy', 'Neutral', 'Stressed', 'Angry', 'Sad'],
++//         required: true
++//     },
+ 
+-    explaination: {
+-        type: String, 
+-        maxLength: 500
+-    },
++//     explaination: {
++//         type: String, 
++//         maxLength: 500
++//     },
+ 
+-    date: {
+-        type: Date,
+-        default: Date.now
+-    },
++//     date: {
++//         type: Date,
++//         default: Date.now
++//     },
+ 
+-    timestamp: {
+-        type: Date,
+-        default: Date.now
+-    }
++//     timestamp: {
++//         type: Date,
++//         default: Date.now
++//     }
+ 
+-}, {
+-    timestamps: true
+-})
++// }, {
++//     timestamps: true
++// })
+ 
+-module.exports = mongoose.model('UserMood', userMoodSchema)
+\ No newline at end of file
++// module.exports = mongoose.model('UserMood', userMoodSchema)
+\ No newline at end of file
+diff --git a/frontend/app/page.tsx b/frontend/app/page.tsx
+index e69de29b..ef9815de 100644
+--- a/frontend/app/page.tsx
++++ b/frontend/app/page.tsx
+@@ -0,0 +1,109 @@
++'use client';
++import { useState, useEffect } from "react";
++
++export default function CitySenseMap() {
++    const [suburbMoods, setSuburbMoods] = useState<{[key: string]: any}>({});
++    const [loading, setLoading] = useState(true);
++
++    const suburbs = ['Bondi', 'Manly', 'Parramatta', 'Sydney CBD'];
++
++    // Fetch data for all suburbs
++    const fetchAllSuburbMoods = async () => {
++        try {
++            const promises = suburbs.map(async (suburb) => {
++                const [weatherRes, pollutionRes] = await Promise.all([
++                    fetch(`http://localhost:3005/v1/citysense/weather?suburb=${suburb}`),
++                    fetch(`http://localhost:3005/v1/citysense/pollution?suburb=${suburb}`)
++                ]);
++                
++                const weather = await weatherRes.json();
++                const pollution = await pollutionRes.json();
++                
++                return {
++                    suburb,
++                    weather: weather.data,
++                    pollution: pollution.data,
++                    // Mock AI prediction for now
++                    aiMood: 'Happy', // Replace with real AI when ready
++                };
++            });
++            
++            const results = await Promise.all(promises);
++            const moodData: {[key: string]: any} = {};
++            results.forEach(result => {
++                moodData[result.suburb] = result;
++            });
++            
++            setSuburbMoods(moodData);
++            setLoading(false);
++        } catch (error) {
++            console.error('Error fetching data:', error);
++        }
++    };
++
++    useEffect(() => {
++        // Fetch immediately
++        fetchAllSuburbMoods();
++        
++        // Then fetch every 30 seconds
++        const interval = setInterval(() => {
++            fetchAllSuburbMoods();
++        }, 30000);
++
++        return () => clearInterval(interval); // Cleanup
++    }, []);
++
++    const SuburbCard = ({ name, data }: { name: string; data: any }) => (
++        <div className="p-4 border rounded-lg shadow-md">
++            <h3 className="font-bold">{name}</h3>
++            {data ? (
++                <>
++                    <p>🌡️ {data.weather.temperature}°C</p>
++                    <p>🌬️ {data.weather.description}</p>
++                    <p>💨 PM2.5: {data.pollution.pm2_5}</p>
++                    <p>😊 Mood: {data.aiMood}</p>
++                </>
++            ) : (
++                <p>Loading...</p>
++            )}
++        </div>
++    );
++
++    const MoodForm = () => (
++        <div className="mt-8 p-4 border rounded-lg">
++            <h3 className="font-bold mb-4">How do you feel today?</h3>
++            <select className="p-2 border rounded mr-4">
++                <option>Select suburb</option>
++                {suburbs.map(suburb => <option key={suburb}>{suburb}</option>)}
++            </select>
++            <select className="p-2 border rounded mr-4">
++                <option>Happy</option>
++                <option>Neutral</option>
++                <option>Stressed</option>
++                <option>Angry</option>
++                <option>Sad</option>
++            </select>
++            <button className="p-2 bg-blue-500 text-white rounded">Submit</button>
++        </div>
++    );
++
++    if (loading) return <div>Loading Sydney mood data...</div>;
++
++    return (
++        <div className="p-8">
++            <h1 className="text-3xl font-bold mb-8">CitySense - Sydney Real-Time Mood Map</h1>
++
++            <div className="grid grid-cols-2 gap-4 mb-8">
++                {suburbs.map(suburb => (
++                    <SuburbCard
++                        key={suburb}
++                        name={suburb}
++                        data={suburbMoods[suburb]}
++                    />
++                ))}
++            </div>
++            
++            <MoodForm />
++        </div>
++    );
++}
+\ No newline at end of file
