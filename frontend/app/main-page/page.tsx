@@ -234,10 +234,10 @@ const suburbSentimentData = [
     sentiment: 0.5,
     description: "Moderate sentiment",
     moodBreakdown: {
-      happy: 35,
-      neutral: 35,
-      angry: 18,
-      sad: 8,
+      happy: 40,
+      neutral: 30,
+      angry: 13,
+      sad: 12,
       stressed: 4,
       totalSubmissions: 110,
     },
@@ -1314,21 +1314,32 @@ export default function SydneySensePage() {
 
     let totalMoodValue = 0;
     suburbSentimentData.forEach((suburb) => {
+      // Convert percentage to actual count based on total submissions for that suburb
       switch (moodType) {
         case "happy":
-          totalMoodValue += suburb.moodBreakdown.happy;
+          totalMoodValue +=
+            (suburb.moodBreakdown.happy / 100) *
+            suburb.moodBreakdown.totalSubmissions;
           break;
         case "neutral":
-          totalMoodValue += suburb.moodBreakdown.neutral;
+          totalMoodValue +=
+            (suburb.moodBreakdown.neutral / 100) *
+            suburb.moodBreakdown.totalSubmissions;
           break;
         case "angry":
-          totalMoodValue += suburb.moodBreakdown.angry;
+          totalMoodValue +=
+            (suburb.moodBreakdown.angry / 100) *
+            suburb.moodBreakdown.totalSubmissions;
           break;
         case "sad":
-          totalMoodValue += suburb.moodBreakdown.sad;
+          totalMoodValue +=
+            (suburb.moodBreakdown.sad / 100) *
+            suburb.moodBreakdown.totalSubmissions;
           break;
         case "stressed":
-          totalMoodValue += suburb.moodBreakdown.stressed;
+          totalMoodValue +=
+            (suburb.moodBreakdown.stressed / 100) *
+            suburb.moodBreakdown.totalSubmissions;
           break;
       }
     });
@@ -1340,11 +1351,45 @@ export default function SydneySensePage() {
 
   // Helper function to create pie chart conic gradient
   const getPieChartGradient = () => {
-    const happyPercent = getOverallMoodPercentage("happy");
-    const neutralPercent = getOverallMoodPercentage("neutral");
-    const angryPercent = getOverallMoodPercentage("angry");
-    const sadPercent = getOverallMoodPercentage("sad");
-    const stressedPercent = getOverallMoodPercentage("stressed");
+    // Calculate total submissions across all suburbs
+    const totalSubmissions = suburbSentimentData.reduce(
+      (sum, suburb) => sum + suburb.moodBreakdown.totalSubmissions,
+      0
+    );
+
+    if (totalSubmissions === 0) return "";
+
+    // Calculate total mood values across all suburbs
+    let totalHappy = 0;
+    let totalNeutral = 0;
+    let totalAngry = 0;
+    let totalSad = 0;
+    let totalStressed = 0;
+
+    suburbSentimentData.forEach((suburb) => {
+      totalHappy +=
+        (suburb.moodBreakdown.happy / 100) *
+        suburb.moodBreakdown.totalSubmissions;
+      totalNeutral +=
+        (suburb.moodBreakdown.neutral / 100) *
+        suburb.moodBreakdown.totalSubmissions;
+      totalAngry +=
+        (suburb.moodBreakdown.angry / 100) *
+        suburb.moodBreakdown.totalSubmissions;
+      totalSad +=
+        (suburb.moodBreakdown.sad / 100) *
+        suburb.moodBreakdown.totalSubmissions;
+      totalStressed +=
+        (suburb.moodBreakdown.stressed / 100) *
+        suburb.moodBreakdown.totalSubmissions;
+    });
+
+    // Convert to percentages of total submissions
+    const happyPercent = (totalHappy / totalSubmissions) * 100;
+    const neutralPercent = (totalNeutral / totalSubmissions) * 100;
+    const angryPercent = (totalAngry / totalSubmissions) * 100;
+    const sadPercent = (totalSad / totalSubmissions) * 100;
+    const stressedPercent = (totalStressed / totalSubmissions) * 100;
 
     let currentAngle = 0;
     const segments = [];
@@ -1485,7 +1530,7 @@ export default function SydneySensePage() {
                   ></div>
                   <div className={styles.dropdownActivityContent}>
                     <div className={styles.dropdownActivityText}>
-                      New positive feedback in Downtown area
+                      New positive feedback in Circular Quay area
                     </div>
                     <div className={styles.dropdownActivityTime}>
                       2 minutes ago
@@ -1499,7 +1544,7 @@ export default function SydneySensePage() {
                   ></div>
                   <div className={styles.dropdownActivityContent}>
                     <div className={styles.dropdownActivityText}>
-                      Neutral sentiment spike in Park District
+                      Neutral sentiment spike in Woolloomooloo area
                     </div>
                     <div className={styles.dropdownActivityTime}>
                       15 minutes ago
@@ -1511,7 +1556,7 @@ export default function SydneySensePage() {
                   <div className={`${styles.activityDot} ${styles.red}`}></div>
                   <div className={styles.dropdownActivityContent}>
                     <div className={styles.dropdownActivityText}>
-                      Concerns raised about traffic in Main St
+                      Concerns raised about traffic in Homebush area
                     </div>
                     <div className={styles.dropdownActivityTime}>
                       1 hour ago
