@@ -12,10 +12,10 @@ const { initializeDatabase } = require('./config/database');
 // Initialize SQLite database
 initializeDatabase();
 
-// const mongoose = require('mongoose');
-// mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
-//   console.log('Connected to MongoDB');
-// });
+// // const mongoose = require('mongoose');
+// // mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
+// //   console.log('Connected to MongoDB');
+// // });
 const app = express();
 
 if (config.env !== 'test') {

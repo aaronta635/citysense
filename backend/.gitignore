@@ -6,10 +6,16 @@ yarn-error.log
 
 # Environment varibales
 .env*
+.venv/
 !.env*.example
 
 # Code coverage
 coverage
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 node_modules/
 my-app/

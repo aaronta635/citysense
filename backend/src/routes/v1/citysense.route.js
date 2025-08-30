@@ -88,5 +88,21 @@ router.post('/mood/form', citysenseController.submitMoodForm);
  */
 router.get('/suburbs/stats', citysenseController.getSuburbMoodStats);
 
+/**
+ * @swagger
+ * /citysense/analyze:
+ *   get:
+ *     summary: Run AI analysis (weather + pollution + moods) and generate newsfeed
+ *     parameters:
+ *       - in: query
+ *         name: suburb
+ *         schema:
+ *           type: string
+ *           default: Sydney
+ *     responses:
+ *       200:
+ *         description: AI analysis results
+ */
+router.get('/analyze', citysenseController.analyzeCity);
 
 module.exports = router;
