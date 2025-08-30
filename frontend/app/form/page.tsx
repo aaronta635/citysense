@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -211,7 +210,7 @@ export default function FeedbackPage() {
                       id="reason-textarea"
                       placeholder="Tell us what's on your mind..."
                       value={reasonText}
-                      onChange={(e) => setReasonText(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setReasonText(e.target.value)}
                       className="reason-textarea"
                       rows={4}
                     />
@@ -227,7 +226,7 @@ export default function FeedbackPage() {
                         type="text"
                         placeholder="Search suburbs..."
                         value={suburbSearch}
-                        onChange={(e) => setSuburbSearch(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSuburbSearch(e.target.value)}
                         className="suburb-search-input"
                       />
                       <Select value={selectedSuburb} onValueChange={setSelectedSuburb}>
