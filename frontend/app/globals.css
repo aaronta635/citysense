@@ -1,26 +1,448 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* 
+=== DESIGN SYSTEM VARIABLES ===
+Custom CSS variables for consistent theming across the feedback form
+Inspired by modern dashboard designs with blue and green accent colors
+*/
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Custom feedback form colors */
+  --feedback-primary: oklch(0.5 0.2 220); /* Modern blue */
+  --feedback-secondary: oklch(0.6 0.15 160); /* Soft green */
+  --feedback-accent: oklch(0.7 0.1 200); /* Light blue accent */
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* 
+=== FEEDBACK FORM CUSTOM STYLES ===
+Modern, clean styling for the feedback form with readable class names
+Inspired by dashboard designs with proper spacing and visual hierarchy
+*/
+
+/* Main page container - full height layout */
+.feedback-page-container {
+  @apply min-h-screen bg-gray-50;
+}
+
+/* Grid layout for sidebar and main content */
+/* Fixed the grid layout to use proper Tailwind syntax */
+.page-layout-grid {
+  @apply grid min-h-screen gap-4;
+  grid-template-columns: 280px 1fr;
+}
+
+/* 
+=== SIDEBAR NAVIGATION STYLES ===
+Left sidebar with navigation menu items
+*/
+.sidebar-navigation {
+  @apply bg-white border-r border-gray-200 p-6;
+}
+
+.sidebar-header {
+  @apply mb-8;
+}
+
+.sidebar-brand-title {
+  @apply text-2xl font-bold text-blue-600;
+}
+
+.sidebar-menu {
+  @apply space-y-2;
+}
+
+.sidebar-menu-item {
+  @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer transition-colors;
+}
+
+.sidebar-menu-item.current {
+  @apply bg-blue-50 text-blue-600 border border-blue-200;
+}
+
+.sidebar-menu-icon {
+  @apply w-5 h-5;
+}
+
+/* 
+=== MAIN CONTENT AREA STYLES ===
+Right side content with header and form
+*/
+.main-content-area {
+  @apply p-8 overflow-auto;
+}
+
+.page-header-section {
+  @apply flex items-center justify-between mb-8;
+}
+
+.page-title-container {
+  @apply space-y-1;
+}
+
+.page-main-title {
+  @apply text-3xl font-bold text-gray-900;
+}
+
+.page-subtitle {
+  @apply text-gray-600;
+}
+
+.submit-feedback-button {
+  @apply bg-green-600 hover:bg-green-700 text-white;
+}
+
+.button-icon {
+  @apply w-4 h-4 mr-2;
+}
+
+/* 
+=== CONTENT GRID LAYOUT ===
+Two-column layout for form and metrics
+*/
+.content-grid-layout {
+  @apply grid gap-8;
+  grid-template-columns: 2fr 1fr;
+}
+
+/* 
+=== FEEDBACK FORM CARD STYLES ===
+Main form container with proper spacing
+*/
+.feedback-form-card {
+  @apply shadow-sm border border-gray-200;
+}
+
+.form-card-header {
+  @apply bg-blue-50 border-b border-blue-100;
+}
+
+.form-card-title {
+  @apply text-xl font-semibold text-blue-900;
+}
+
+.form-card-description {
+  @apply text-blue-700;
+}
+
+.form-card-content {
+  @apply p-6;
+}
+
+.feedback-form {
+  @apply space-y-6;
+}
+
+/* 
+=== FORM FIELD STYLES ===
+Individual form elements with consistent spacing
+*/
+.form-field-group {
+  @apply space-y-2;
+}
+
+.form-field-label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+/* Mood selection dropdown styles */
+.mood-select-trigger {
+  @apply w-full;
+}
+
+.mood-select-content {
+  @apply w-full;
+}
+
+.mood-select-item {
+  @apply cursor-pointer;
+}
+
+.mood-option-container {
+  @apply flex items-center gap-2;
+}
+
+.mood-icon {
+  @apply w-4 h-4;
+}
+
+.mood-label {
+  @apply text-sm;
+}
+
+/* Reason textarea styles */
+.reason-textarea {
+  @apply w-full resize-none;
+}
+
+/* Suburb search and selection styles */
+.suburb-search-container {
+  @apply space-y-2;
+}
+
+.suburb-search-input {
+  @apply w-full;
+}
+
+.suburb-select-trigger {
+  @apply w-full;
+}
+
+.suburb-select-content {
+  @apply w-full;
+}
+
+.suburb-select-item {
+  @apply cursor-pointer;
+}
+
+.suburb-option-container {
+  @apply flex items-center gap-2;
+}
+
+.suburb-icon {
+  @apply w-4 h-4 text-gray-500;
+}
+
+.suburb-name {
+  @apply text-sm;
+}
+
+/* Form submit button */
+.form-submit-button {
+  @apply w-full bg-blue-600 hover:bg-blue-700 text-white mt-6;
+}
+
+/* 
+=== METRICS SIDEBAR STYLES ===
+Right sidebar with key metrics display
+*/
+.metrics-sidebar-card {
+  @apply shadow-sm border border-gray-200;
+}
+
+.metrics-card-header {
+  @apply bg-gray-50 border-b border-gray-100;
+}
+
+.metrics-card-title {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.metrics-card-content {
+  @apply p-6 space-y-6;
+}
+
+/* Individual metric item styles */
+.metric-item {
+  @apply flex items-center gap-4;
+}
+
+.metric-icon-container {
+  @apply w-10 h-10 rounded-lg flex items-center justify-center;
+}
+
+.metric-icon-container.sentiment {
+  @apply bg-green-100;
+}
+
+.metric-icon-container.residents {
+  @apply bg-blue-100;
+}
+
+.metric-icon-container.comments {
+  @apply bg-purple-100;
+}
+
+.metric-icon-container.growth {
+  @apply bg-orange-100;
+}
+
+.metric-icon {
+  @apply w-5 h-5;
+}
+
+.metric-icon-container.sentiment .metric-icon {
+  @apply text-green-600;
+}
+
+.metric-icon-container.residents .metric-icon {
+  @apply text-blue-600;
+}
+
+.metric-icon-container.comments .metric-icon {
+  @apply text-purple-600;
+}
+
+.metric-icon-container.growth .metric-icon {
+  @apply text-orange-600;
+}
+
+.metric-details {
+  @apply flex flex-col;
+}
+
+.metric-label {
+  @apply text-sm text-gray-600;
+}
+
+.metric-value {
+  @apply text-xl font-bold text-gray-900;
+}
+
+.metric-sublabel {
+  @apply text-xs text-gray-500;
+}
+
+.metric-value.growth-positive {
+  @apply text-green-600;
+}
+
+/* 
+=== RESPONSIVE DESIGN ===
+Mobile-first responsive adjustments
+*/
+@media (max-width: 1024px) {
+  .page-layout-grid {
+    @apply grid-cols-1;
+  }
+
+  .sidebar-navigation {
+    @apply hidden;
+  }
+
+  .content-grid-layout {
+    @apply grid-cols-1;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content-area {
+    @apply p-4;
+  }
+
+  .page-header-section {
+    @apply flex-col items-start gap-4;
+  }
 }
