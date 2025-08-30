@@ -14,428 +14,32 @@ const SYDNEY_BOUNDS = {
   west: 150.9,
 };
 
-const suburbSentimentData = [
-  {
-    name: "Sydney CBD",
-    center: { lat: -33.8688, lng: 151.2093 },
-    radius: 300,
-    sentiment: 0.8,
-    description: "High positive sentiment",
-    moodBreakdown: {
-      happy: 60,
-      neutral: 20,
-      angry: 8,
-      sad: 7,
-      stressed: 5,
-      totalSubmissions: 150,
-    },
-  },
-  {
-    name: "The Rocks",
-    center: { lat: -33.8588, lng: 151.2088 },
-    radius: 300,
-    sentiment: 0.6,
-    description: "Moderate positive sentiment",
-    moodBreakdown: {
-      happy: 40,
-      neutral: 35,
-      angry: 12,
-      sad: 8,
-      stressed: 5,
-      totalSubmissions: 89,
-    },
-  },
-  {
-    name: "Pyrmont",
-    center: { lat: -33.8715, lng: 151.2006 },
-    radius: 300,
-    sentiment: 0.3,
-    description: "Neutral sentiment",
-    moodBreakdown: {
-      happy: 20,
-      neutral: 45,
-      angry: 20,
-      sad: 10,
-      stressed: 5,
-      totalSubmissions: 112,
-    },
-  },
-  {
-    name: "Ultimo",
-    center: { lat: -33.883, lng: 151.2093 },
-    radius: 300,
-    sentiment: 0.1,
-    description: "High stress area",
-    moodBreakdown: {
-      happy: 5,
-      neutral: 15,
-      angry: 20,
-      sad: 25,
-      stressed: 35,
-      totalSubmissions: 78,
-    },
-  },
-  {
-    name: "Circular Quay",
-    center: { lat: -33.8568, lng: 151.2036 },
-    radius: 300,
-    sentiment: 0.9,
-    description: "Very high positive sentiment",
-    moodBreakdown: {
-      happy: 75,
-      neutral: 12,
-      angry: 4,
-      sad: 6,
-      stressed: 3,
-      totalSubmissions: 95,
-    },
-  },
-  {
-    name: "Woolloomooloo",
-    center: { lat: -33.87, lng: 151.22 },
-    radius: 300,
-    sentiment: 0.4,
-    description: "Moderate sentiment",
-    moodBreakdown: {
-      happy: 25,
-      neutral: 40,
-      angry: 20,
-      sad: 10,
-      stressed: 5,
-      totalSubmissions: 67,
-    },
-  },
-  {
-    name: "Glebe",
-    center: { lat: -33.89, lng: 151.2 },
-    radius: 300,
-    sentiment: 0.7,
-    description: "Good positive sentiment",
-    moodBreakdown: {
-      happy: 50,
-      neutral: 25,
-      angry: 12,
-      sad: 8,
-      stressed: 5,
-      totalSubmissions: 134,
-    },
-  },
-  {
-    name: "Newtown",
-    center: { lat: -33.88, lng: 151.18 },
-    radius: 300,
-    sentiment: 0.2,
-    description: "High sadness area",
-    moodBreakdown: {
-      happy: 8,
-      neutral: 20,
-      angry: 15,
-      sad: 42,
-      stressed: 15,
-      totalSubmissions: 156,
-    },
-  },
-  {
-    name: "Parramatta",
-    center: { lat: -33.8148, lng: 151.0 },
-    radius: 300,
-    sentiment: 0.6,
-    description: "Good positive sentiment",
-    moodBreakdown: {
-      happy: 45,
-      neutral: 30,
-      angry: 12,
-      sad: 8,
-      stressed: 5,
-      totalSubmissions: 203,
-    },
-  },
-  {
-    name: "Hornsby",
-    center: { lat: -33.7, lng: 151.1 },
-    radius: 300,
-    sentiment: 0.8,
-    description: "High positive sentiment",
-    moodBreakdown: {
-      happy: 65,
-      neutral: 18,
-      angry: 8,
-      sad: 6,
-      stressed: 3,
-      totalSubmissions: 98,
-    },
-  },
-  {
-    name: "Bondi",
-    center: { lat: -33.85, lng: 151.28 },
-    radius: 300,
-    sentiment: 0.7,
-    description: "Good positive sentiment",
-    moodBreakdown: {
-      happy: 55,
-      neutral: 22,
-      angry: 12,
-      sad: 7,
-      stressed: 4,
-      totalSubmissions: 145,
-    },
-  },
-  {
-    name: "Manly",
-    center: { lat: -33.7969, lng: 151.2854 },
-    radius: 300,
-    sentiment: 0.8,
-    description: "High positive sentiment",
-    moodBreakdown: {
-      happy: 70,
-      neutral: 18,
-      angry: 4,
-      sad: 5,
-      stressed: 3,
-      totalSubmissions: 120,
-    },
-  },
-  {
-    name: "North Sydney",
-    center: { lat: -33.8405, lng: 151.2073 },
-    radius: 300,
-    sentiment: 0.7,
-    description: "Good positive sentiment",
-    moodBreakdown: {
-      happy: 55,
-      neutral: 25,
-      angry: 8,
-      sad: 8,
-      stressed: 4,
-      totalSubmissions: 95,
-    },
-  },
-  {
-    name: "Chatswood",
-    center: { lat: -33.8014, lng: 151.1805 },
-    radius: 300,
-    sentiment: 0.6,
-    description: "Moderate positive sentiment",
-    moodBreakdown: {
-      happy: 45,
-      neutral: 30,
-      angry: 12,
-      sad: 8,
-      stressed: 5,
-      totalSubmissions: 180,
-    },
-  },
-  {
-    name: "Burwood",
-    center: { lat: -33.8889, lng: 151.1033 },
-    radius: 300,
-    sentiment: 0.5,
-    description: "Moderate sentiment",
-    moodBreakdown: {
-      happy: 40,
-      neutral: 30,
-      angry: 13,
-      sad: 12,
-      stressed: 4,
-      totalSubmissions: 110,
-    },
-  },
-  {
-    name: "Strathfield",
-    center: { lat: -33.8647, lng: 151.0897 },
-    radius: 300,
-    sentiment: 0.4,
-    description: "High anger area",
-    moodBreakdown: {
-      happy: 10,
-      neutral: 15,
-      angry: 50,
-      sad: 15,
-      stressed: 10,
-      totalSubmissions: 85,
-    },
-  },
-  {
-    name: "Auburn",
-    center: { lat: -33.8508, lng: 151.0325 },
-    radius: 300,
-    sentiment: 0.3,
-    description: "High sadness area",
-    moodBreakdown: {
-      happy: 15,
-      neutral: 25,
-      angry: 20,
-      sad: 35,
-      stressed: 5,
-      totalSubmissions: 140,
-    },
-  },
-  {
-    name: "Bankstown",
-    center: { lat: -33.9244, lng: 151.0249 },
-    radius: 300,
-    sentiment: 0.2,
-    description: "High stress area",
-    moodBreakdown: {
-      happy: 10,
-      neutral: 20,
-      angry: 25,
-      sad: 15,
-      stressed: 30,
-      totalSubmissions: 200,
-    },
-  },
-  {
-    name: "Liverpool",
-    center: { lat: -33.9244, lng: 150.9249 },
-    radius: 300,
-    sentiment: 0.4,
-    description: "High anger area",
-    moodBreakdown: {
-      happy: 8,
-      neutral: 20,
-      angry: 52,
-      sad: 12,
-      stressed: 8,
-      totalSubmissions: 160,
-    },
-  },
-  {
-    name: "Campbelltown",
-    center: { lat: -34.0668, lng: 150.8172 },
-    radius: 300,
-    sentiment: 0.3,
-    description: "High anger area",
-    moodBreakdown: {
-      happy: 10,
-      neutral: 20,
-      angry: 45,
-      sad: 15,
-      stressed: 10,
-      totalSubmissions: 125,
-    },
-  },
-  {
-    name: "Penrith",
-    center: { lat: -33.7507, lng: 150.6955 },
-    radius: 300,
-    sentiment: 0.5,
-    description: "Moderate positive sentiment",
-    moodBreakdown: {
-      happy: 40,
-      neutral: 35,
-      angry: 12,
-      sad: 8,
-      stressed: 5,
-      totalSubmissions: 180,
-    },
-  },
-  {
-    name: "Blacktown",
-    center: { lat: -33.7667, lng: 150.9167 },
-    radius: 300,
-    sentiment: 0.4,
-    description: "High anger area",
-    moodBreakdown: {
-      happy: 12,
-      neutral: 18,
-      angry: 45,
-      sad: 15,
-      stressed: 10,
-      totalSubmissions: 220,
-    },
-  },
-  {
-    name: "Castle Hill",
-    center: { lat: -33.7333, lng: 151.0167 },
-    radius: 300,
-    sentiment: 0.7,
-    description: "Good positive sentiment",
-    moodBreakdown: {
-      happy: 55,
-      neutral: 25,
-      angry: 8,
-      sad: 8,
-      stressed: 4,
-      totalSubmissions: 95,
-    },
-  },
-  {
-    name: "Baulkham Hills",
-    center: { lat: -33.75, lng: 151.0 },
-    radius: 300,
-    sentiment: 0.6,
-    description: "Moderate positive sentiment",
-    moodBreakdown: {
-      happy: 45,
-      neutral: 30,
-      angry: 12,
-      sad: 8,
-      stressed: 5,
-      totalSubmissions: 110,
-    },
-  },
-  {
-    name: "Kellyville",
-    center: { lat: -33.7167, lng: 150.95 },
-    radius: 300,
-    sentiment: 0.7,
-    description: "Good positive sentiment",
-    moodBreakdown: {
-      happy: 60,
-      neutral: 22,
-      angry: 8,
-      sad: 7,
-      stressed: 3,
-      totalSubmissions: 85,
-    },
-  },
-  {
-    name: "Rouse Hill",
-    center: { lat: -33.6833, lng: 150.9167 },
-    radius: 300,
-    sentiment: 0.8,
-    description: "High positive sentiment",
-    moodBreakdown: {
-      happy: 65,
-      neutral: 18,
-      angry: 8,
-      sad: 6,
-      stressed: 3,
-      totalSubmissions: 75,
-    },
-  },
-  {
-    name: "The Ponds",
-    center: { lat: -33.7, lng: 150.9 },
-    radius: 300,
-    sentiment: 0.7,
-    description: "Good positive sentiment",
-    moodBreakdown: {
-      happy: 55,
-      neutral: 25,
-      angry: 8,
-      sad: 8,
-      stressed: 4,
-      totalSubmissions: 60,
-    },
-  },
-  {
-    name: "Riverstone",
-    center: { lat: -33.6833, lng: 150.8667 },
-    radius: 300,
-    sentiment: 0.5,
-    description: "Moderate sentiment",
-    moodBreakdown: {
-      happy: 35,
-      neutral: 40,
-      angry: 12,
-      sad: 8,
-      stressed: 5,
-      totalSubmissions: 70,
-    },
-  },
-];
+// Hardcoded coordinates for 20 largest Sydney suburbs
+const SYDNEY_SUBURBS: { [key: string]: { lat: number; lng: number } } = {
+  'Sydney': { lat: -33.8688, lng: 151.2093 },
+  'Parramatta': { lat: -33.8168, lng: 151.0016 },
+  'Liverpool': { lat: -33.9249, lng: 150.9239 },
+  'Penrith': { lat: -33.7500, lng: 150.7000 },
+  'Blacktown': { lat: -33.7667, lng: 150.9167 },
+  'Campbelltown': { lat: -34.0667, lng: 150.8167 },
+  'Hurstville': { lat: -33.9667, lng: 151.1000 },
+  'Bankstown': { lat: -33.9167, lng: 151.0333 },
+  'Auburn': { lat: -33.8500, lng: 151.0333 },
+  'Fairfield': { lat: -33.8667, lng: 150.9500 },
+  'Cabramatta': { lat: -33.9000, lng: 150.9333 },
+  'Canterbury': { lat: -33.9167, lng: 151.0167 },
+  'Rockdale': { lat: -33.9500, lng: 151.1333 },
+  'Kogarah': { lat: -33.9667, lng: 151.1333 },
+  'Maroubra': { lat: -33.9500, lng: 151.2333 },
+  'Randwick': { lat: -33.9167, lng: 151.2500 },
+  'Bondi': { lat: -33.8914, lng: 151.2767 },
+  'Manly': { lat: -33.7969, lng: 151.2856 },
+  'Chatswood': { lat: -33.8000, lng: 151.1833 },
+  'Hornsby': { lat: -33.7000, lng: 151.1000 }
+};
+
+
+
 
 interface MoodBreakdown {
   happy: number;
@@ -463,12 +67,42 @@ export default function SydneySensePage() {
   const [stats, setStats] = useState({ suburbsShown: 0, avgSentiment: "0%" });
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [suburbSearchTerm, setSuburbSearchTerm] = useState("");
-  const [filteredSuburbs, setFilteredSuburbs] = useState(suburbSentimentData);
+  const [filteredSuburbs, setFilteredSuburbs] = useState<SuburbData[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showMoodStats, setShowMoodStats] = useState(false);
+  const [suburbData, setSuburbData] = useState<SuburbData[]>([]);
+  const [allAvailableSuburbs, setAllAvailableSuburbs] = useState<string[]>([]);
 
   const mapRef = useRef<HTMLDivElement>(null);
+
+  // Function to get coordinates for each suburb using hardcoded data
+  const getCoordinatesForSuburb = (suburbName: string): { lat: number; lng: number } => {
+    // Check if we have hardcoded coordinates for this suburb
+    if (SYDNEY_SUBURBS[suburbName]) {
+      console.log(`📍 Found coordinates for ${suburbName}:`, SYDNEY_SUBURBS[suburbName]);
+      return SYDNEY_SUBURBS[suburbName];
+    }
+    
+    // If not found, try to find a close match
+    const normalizedSuburbName = suburbName.toLowerCase().trim();
+    for (const [name, coords] of Object.entries(SYDNEY_SUBURBS)) {
+      if (name.toLowerCase().includes(normalizedSuburbName) || 
+          normalizedSuburbName.includes(name.toLowerCase())) {
+        console.log(`📍 Found approximate match for ${suburbName}: ${name}`, coords);
+        return coords;
+      }
+    }
+    
+    // Default to Sydney CBD if no match found
+    console.warn(`⚠️ No coordinates found for ${suburbName}, using Sydney CBD coordinates`);
+    return { lat: -33.8688, lng: 151.2093 };
+  };
+
+  // Function to get all available suburbs for search
+  const getAllAvailableSuburbs = (): string[] => {
+    return Object.keys(SYDNEY_SUBURBS);
+  };
 
   const toggleDropdown = () => {
     console.log("Dropdown clicked, current state:", isDropdownOpen);
@@ -505,6 +139,118 @@ export default function SydneySensePage() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isDropdownOpen, showSuggestions, isProfileOpen]);
+
+  // Fetch suburb data from API
+  useEffect(() => {
+    // Initialize available suburbs for search
+    const availableSuburbs = getAllAvailableSuburbs();
+    setAllAvailableSuburbs(availableSuburbs);
+    console.log('🏘️ Available suburbs for search:', availableSuburbs);
+
+    const fetchSuburbData = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/v1/citysense/data/combined');
+        const result = await response.json();
+        
+        if (result.success) {
+          console.log('✅ Backend responded successfully!');
+          console.log('Raw backend data:', result.data.suburbs);
+          console.log('Number of suburbs from backend:', result.data.suburbs.length);
+          
+          // Transform backend data to match frontend expectations
+          // Only include suburbs that have mood data
+          const suburbsWithMood = result.data.suburbs.filter((suburbItem: { suburb: string; mood?: { breakdown: any; sentiment?: number } }) => suburbItem.mood?.breakdown);
+          console.log('🏘️ Suburbs with mood data:', suburbsWithMood.length);
+          console.log('🏘️ Suburb names:', suburbsWithMood.map((s: any) => s.suburb));
+          
+          // Get coordinates for all suburbs using hardcoded data
+          const transformedData = suburbsWithMood.map((suburbItem: { suburb: string; mood?: { breakdown: any; sentiment?: number } }) => {
+            try {
+              // Get coordinates for each suburb
+              console.log('🔍 Looking up coordinates for suburb:', suburbItem.suburb);
+              const coordinates = getCoordinatesForSuburb(suburbItem.suburb);
+              console.log('📍 Got coordinates:', coordinates);
+              
+              const mood = suburbItem.mood!.breakdown;
+              const total = mood.totalSubmissions || 1;
+              
+              // Convert counts to percentages
+              const moodBreakdown = {
+                happy: Math.round((mood.happy || 0) / total * 100),
+                neutral: Math.round((mood.neutral || 0) / total * 100),
+                angry: Math.round((mood.angry || 0) / total * 100),
+                sad: Math.round((mood.sad || 0) / total * 100),
+                stressed: Math.round((mood.stressed || 0) / total * 100),
+                totalSubmissions: total
+              };
+              
+              return {
+                name: suburbItem.suburb,
+                center: coordinates,
+                radius: 500, // Default radius in meters
+                sentiment: suburbItem.mood?.sentiment || 0.5,
+                description: `Community mood data for ${suburbItem.suburb} (${total} submissions)`,
+                moodBreakdown: moodBreakdown
+              };
+            } catch (error) {
+              console.error(`❌ Error processing suburb ${suburbItem.suburb}:`, error);
+              return null; // Return null for failed suburbs
+            }
+          });
+          
+          // Filter out any failed suburbs
+          const validTransformedData = transformedData.filter((item: any) => item !== null);
+          console.log('✅ Successfully processed suburbs:', validTransformedData.length);
+          console.log('❌ Failed suburbs:', transformedData.length - validTransformedData.length);
+          
+          console.log('Transformed data:', transformedData);
+          console.log('Number of suburbs with mood data:', validTransformedData.length);
+          
+          if (validTransformedData.length > 0) {
+            setSuburbData(validTransformedData);
+            
+            // Check if we have active filters
+            const sentimentFilter = document.getElementById("sentimentFilter") as HTMLSelectElement;
+            const hasActiveFilter = sentimentFilter && sentimentFilter.value !== "all";
+            const hasSearchFilter = suburbSearchTerm.trim() !== "";
+            
+            if (hasActiveFilter || hasSearchFilter) {
+              // Keep current filtered state
+              console.log('🔍 Keeping current filter state, not updating map yet');
+            } else {
+              // No active filters, show all suburbs
+              setFilteredSuburbs(validTransformedData);
+              console.log('✅ Data set successfully! Should see all suburbs on map.');
+              
+              // If map is already loaded, update the circles
+              if (map) {
+                console.log('🗺️ Map exists, updating circles...');
+                // Clear existing circles and create new ones
+                suburbCircles.forEach(circle => circle.setMap(null));
+                setSuburbCircles([]);
+                
+                // Create new circles with fetched data
+                const newCircles: google.maps.Circle[] = createSuburbSentimentCircles(map, validTransformedData);
+                setSuburbCircles(newCircles);
+                console.log('✅ Map updated with new circles:', newCircles.length);
+              }
+            }
+          } else {
+            console.log('❌ No suburbs with mood data found!');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching suburb data:', error);
+      }
+    };
+
+    fetchSuburbData();
+    
+    // Refresh data every 30 seconds
+    const interval = setInterval(fetchSuburbData, 30000);
+    return () => clearInterval(interval);
+  }, [map]);
+
 
   const getSentimentColor = (
     sentimentScore: number,
@@ -579,19 +325,28 @@ export default function SydneySensePage() {
 
       addSydneyBoundaryIndicator(newMap);
 
-      const circles = createSuburbSentimentCircles(newMap);
-      setSuburbCircles(circles);
+      // Only create circles if we have data
+      if (suburbData.length > 0) {
+        // Use filtered suburbs if available, otherwise use all suburb data
+        const dataToShow = filteredSuburbs.length > 0 ? filteredSuburbs : suburbData;
+        console.log(`🗺️ Initializing map with ${dataToShow.length} suburbs:`, dataToShow.map(s => s.name));
+        
+        const circles = createSuburbSentimentCircles(newMap, dataToShow);
+        setSuburbCircles(circles);
+        
+        setTimeout(() => {
+          if (circles.length > 0) {
+            console.log(
+              `✅ Successfully created ${circles.length} interactive suburb circles`
+            );
+          }
+        }, 100);
+      } else {
+        console.log('⏳ No suburb data yet, circles will be created when data arrives');
+      }
 
-      setTimeout(() => {
-        if (circles.length > 0) {
-          console.log(
-            `Successfully created ${circles.length} interactive suburb circles`
-          );
-        }
-      }, 100);
-
-      const totalSuburbs = suburbSentimentData.length;
-      const totalSentiment = suburbSentimentData.reduce(
+      const totalSuburbs = suburbData.length;
+      const totalSentiment = suburbData.reduce(
         (sum, suburb) => sum + suburb.sentiment,
         0
       );
@@ -622,11 +377,15 @@ export default function SydneySensePage() {
   };
 
   const createSuburbSentimentCircles = (
-    mapInstance: google.maps.Map
+    mapInstance: google.maps.Map,
+    dataToUse: SuburbData[] = suburbData
   ): google.maps.Circle[] => {
     const circles: google.maps.Circle[] = [];
 
-    suburbSentimentData.forEach((suburb) => {
+    console.log(`🎯 Creating ${dataToUse.length} circles for suburbs:`, dataToUse.map(s => s.name));
+
+    dataToUse.forEach((suburb) => {
+      console.log('📍 Creating circle for:', suburb.name, 'at coordinates:', suburb.center);
       const circleColor = getSentimentColor(
         suburb.sentiment,
         suburb.moodBreakdown
@@ -661,16 +420,25 @@ export default function SydneySensePage() {
         strokeWeight: 2,
         map: mapInstance,
       });
+      
+      console.log('🎯 Circle created:', {
+        name: suburb.name,
+        center: suburb.center,
+        radius: suburb.radius,
+        color: circleColor,
+        opacity: finalOpacity
+      });
 
       (suburbCircle as any).originalOpacity = finalOpacity;
       (suburbCircle as any).originalStrokeColor = circleColor;
+      (suburbCircle as any).suburbName = suburb.name; // Add suburb name for debugging
 
       makeSuburbCircleInteractive(suburbCircle, mapInstance, suburb);
 
       circles.push(suburbCircle);
     });
 
-    console.log("Created sentiment circles for all Sydney suburbs");
+    console.log(`✅ Created ${circles.length} sentiment circles for suburbs`);
     return circles;
   };
 
@@ -732,8 +500,8 @@ export default function SydneySensePage() {
   };
 
   const calculateInitialStats = () => {
-    const totalSuburbs = suburbSentimentData.length;
-    const totalSentiment = suburbSentimentData.reduce(
+    const totalSuburbs = suburbData.length;
+    const totalSentiment = suburbData.reduce(
       (sum, suburb) => sum + suburb.sentiment,
       0
     );
@@ -746,129 +514,158 @@ export default function SydneySensePage() {
     const selectedFilter = (
       document.getElementById("sentimentFilter") as HTMLSelectElement
     ).value;
-    let visibleCount = 0;
-    let totalSentiment = 0;
-    let visibleSuburbs = 0;
-
-    suburbCircles.forEach((circle, index) => {
-      const suburb = suburbSentimentData[index];
-      let shouldShow = false;
-
+    
+    console.log("🎭 Filtering by sentiment:", selectedFilter);
+    
+    if (selectedFilter === "all") {
+      // Show all suburbs
+      console.log("🔄 Showing all suburbs");
+      setFilteredSuburbs(suburbData);
+      if (map) {
+        // Clear existing circles completely
+        console.log(`🗑️ Clearing ${suburbCircles.length} existing circles`);
+        suburbCircles.forEach(circle => {
+          circle.setMap(null);
+        });
+        setSuburbCircles([]);
+        
+        // Create new circles with all data
+        console.log("🆕 Creating circles for all suburbs");
+        const newCircles: google.maps.Circle[] = createSuburbSentimentCircles(map, suburbData);
+        setSuburbCircles(newCircles);
+        
+        // Update stats
+        const totalSentiment = suburbData.reduce((sum, suburb) => sum + suburb.sentiment, 0);
+        updateFilterStats(suburbData.length, totalSentiment, suburbData.length);
+      }
+      return;
+    }
+    
+    // Filter the data first
+    const filteredResults = suburbData.filter(suburb => {
       if (suburb.moodBreakdown) {
         const { happy, neutral, angry, sad, stressed } = suburb.moodBreakdown;
 
         switch (selectedFilter) {
           case "happy":
-            shouldShow =
-              happy >= neutral &&
-              happy >= angry &&
-              happy >= sad &&
-              happy >= stressed;
-            break;
+            return happy > 0 && happy >= neutral && happy >= angry && happy >= sad && happy >= stressed;
           case "neutral":
-            shouldShow =
-              neutral >= happy &&
-              neutral >= angry &&
-              neutral >= sad &&
-              neutral >= stressed;
-            break;
+            return neutral > 0 && neutral >= happy && neutral >= angry && neutral >= sad && neutral >= stressed;
           case "angry":
-            shouldShow =
-              angry >= happy &&
-              angry >= neutral &&
-              angry >= sad &&
-              angry >= stressed;
-            break;
+            return angry > 0 && angry >= happy && angry >= neutral && angry >= sad && angry >= stressed;
           case "sad":
-            shouldShow =
-              sad >= happy && sad >= neutral && sad >= angry && sad >= stressed;
-            break;
+            return sad > 0 && sad >= happy && sad >= neutral && sad >= angry && sad >= stressed;
           case "stressed":
-            shouldShow =
-              stressed >= happy &&
-              stressed >= neutral &&
-              stressed >= angry &&
-              stressed >= sad;
-            break;
+            return stressed > 0 && stressed >= happy && stressed >= neutral && stressed >= angry && stressed >= sad;
           default:
-            shouldShow = true;
-            break;
+            return true;
         }
       } else {
+        // Fallback to sentiment-based filtering if no mood breakdown
         switch (selectedFilter) {
           case "happy":
-            shouldShow = suburb.sentiment >= 0.66;
-            break;
+            return suburb.sentiment >= 0.66;
           case "neutral":
-            shouldShow = suburb.sentiment >= 0.33 && suburb.sentiment < 0.66;
-            break;
+            return suburb.sentiment >= 0.33 && suburb.sentiment < 0.66;
           case "angry":
-            shouldShow = suburb.sentiment < 0.33;
-            break;
+            return suburb.sentiment < 0.33;
           default:
-            shouldShow = true;
-            break;
+            return true;
         }
-      }
-
-      if (shouldShow) {
-        circle.setMap(map);
-        visibleCount++;
-        totalSentiment += suburb.sentiment;
-        visibleSuburbs++;
-      } else {
-        circle.setMap(null);
       }
     });
 
-    updateFilterStats(visibleCount, totalSentiment, visibleSuburbs);
+    console.log(`✅ Filtered ${filteredResults.length} suburbs for ${selectedFilter} mood:`, filteredResults.map(s => s.name));
+    
+    // Update filtered suburbs state
+    setFilteredSuburbs(filteredResults);
+    
+    // Recreate circles with filtered data
+    if (map) {
+      // Clear existing circles completely
+      console.log(`🗑️ Clearing ${suburbCircles.length} existing circles`);
+      suburbCircles.forEach(circle => {
+        circle.setMap(null);
+      });
+      setSuburbCircles([]);
+      
+      // Create new circles with filtered data only
+      console.log(`🆕 Creating ${filteredResults.length} circles for filtered suburbs`);
+      const newCircles: google.maps.Circle[] = createSuburbSentimentCircles(map, filteredResults);
+      setSuburbCircles(newCircles);
+      
+      // Update stats
+      const totalSentiment = filteredResults.reduce((sum, suburb) => sum + suburb.sentiment, 0);
+      updateFilterStats(filteredResults.length, totalSentiment, filteredResults.length);
+    }
   };
 
   const filterBySuburb = (selectedSuburb: string) => {
     console.log("=== FILTER BY SUBURB DEBUG ===");
     console.log("Filtering by suburb:", selectedSuburb);
     console.log("Map state:", map ? "Available" : "Not available");
-    console.log("Suburb circles count:", suburbCircles.length);
-    console.log("suburbSentimentData length:", suburbSentimentData.length);
+    console.log("suburbData length:", suburbData.length);
 
-    let visibleCount = 0;
-    let totalSentiment = 0;
-    let visibleSuburbs = 0;
-    let selectedSuburbData: SuburbData | null = null;
-
-    if (!map || suburbCircles.length === 0) {
-      console.error("Map or suburb circles not available for filtering");
+    if (!map) {
+      console.error("Map not available for filtering");
       return;
     }
 
-    suburbCircles.forEach((circle, index) => {
-      const suburb = suburbSentimentData[index];
-      let shouldShow = false;
+    let filteredResults: SuburbData[];
+    let selectedSuburbData: SuburbData | null = null;
 
-      if (selectedSuburb === "all") {
-        shouldShow = true;
+    if (selectedSuburb === "all") {
+      filteredResults = suburbData;
+      console.log("Showing all suburbs:", filteredResults.length);
+    } else {
+      // Check if the selected suburb exists in our data
+      let foundSuburb = suburbData.find(suburb => suburb.name === selectedSuburb);
+      
+      if (foundSuburb) {
+        filteredResults = [foundSuburb];
+        selectedSuburbData = foundSuburb;
+        console.log(`Found suburb with mood data: ${selectedSuburb}`);
       } else {
-        shouldShow = suburb.name === selectedSuburb;
-        if (shouldShow) {
-          selectedSuburbData = suburb;
-          console.log(
-            "Found matching suburb:",
-            suburb.name,
-            "at index:",
-            index
-          );
-        }
+        // Create a placeholder suburb entry if no mood data exists
+        const coordinates = getCoordinatesForSuburb(selectedSuburb);
+        const placeholderSuburb = {
+          name: selectedSuburb,
+          center: coordinates,
+          radius: 500,
+          sentiment: 0.5,
+          description: `Suburb: ${selectedSuburb} (no mood data yet)`,
+          moodBreakdown: {
+            happy: 0,
+            neutral: 0,
+            angry: 0,
+            sad: 0,
+            stressed: 0,
+            totalSubmissions: 0
+          }
+        };
+        filteredResults = [placeholderSuburb];
+        selectedSuburbData = placeholderSuburb;
+        console.log(`Created placeholder for suburb: ${selectedSuburb}`);
       }
+      
+      console.log(`Filtered to ${filteredResults.length} suburbs for "${selectedSuburb}"`);
+    }
 
-      if (shouldShow) {
-        circle.setMap(map);
-        visibleCount++;
-        totalSentiment += suburb.sentiment;
-        visibleSuburbs++;
-      } else {
-        circle.setMap(null);
-      }
+    // Update filtered suburbs state
+    setFilteredSuburbs(filteredResults);
+    
+    // Clear existing circles completely
+    console.log(`🗑️ Clearing ${suburbCircles.length} existing circles`);
+    suburbCircles.forEach(circle => {
+      circle.setMap(null);
     });
+    setSuburbCircles([]);
+    
+    // Create new circles with filtered data only
+    console.log(`🆕 Creating ${filteredResults.length} circles for filtered suburbs`);
+    const newCircles: google.maps.Circle[] = createSuburbSentimentCircles(map, filteredResults);
+    setSuburbCircles(newCircles);
+    console.log(`✅ Created ${newCircles.length} circles for filtered suburbs`);
 
     if (selectedSuburb !== "all" && selectedSuburbData && map) {
       const suburb = selectedSuburbData as SuburbData;
@@ -883,15 +680,11 @@ export default function SydneySensePage() {
       map.setCenter(SYDNEY_CENTER);
       map.setZoom(14);
       hideMoodBreakdown();
-    } else {
-      console.log("=== NO MOOD BREAKDOWN SHOWN ===");
-      console.log("selectedSuburb:", selectedSuburb);
-      console.log("selectedSuburbData:", selectedSuburbData);
-      console.log("map:", map);
-      console.log("=== END DEBUG ===");
     }
 
-    updateFilterStats(visibleCount, totalSentiment, visibleSuburbs);
+    // Update stats
+    const totalSentiment = filteredResults.reduce((sum, suburb) => sum + suburb.sentiment, 0);
+    updateFilterStats(filteredResults.length, totalSentiment, filteredResults.length);
   };
 
   const handleSuburbSearch = (searchTerm: string) => {
@@ -903,16 +696,64 @@ export default function SydneySensePage() {
 
     const newTimeout = setTimeout(() => {
       if (searchTerm.trim() === "") {
-        setFilteredSuburbs(suburbSentimentData);
+        // Reset to show all suburbs
+        setFilteredSuburbs(suburbData);
         setShowSuggestions(false);
         filterBySuburb("all");
-      } else {
-        const filtered = suburbSentimentData.filter((suburb) =>
-          suburb.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredSuburbs(filtered);
-        setShowSuggestions(true);
-      }
+              } else {
+          // Filter suburbs by search term from all available suburbs
+          const filtered = allAvailableSuburbs.filter((suburb) =>
+            suburb.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+          setFilteredSuburbs(filtered.map(name => ({
+            name,
+            center: getCoordinatesForSuburb(name),
+            radius: 500,
+            sentiment: 0.5,
+            description: `Suburb: ${name}`,
+            moodBreakdown: {
+              happy: 0,
+              neutral: 0,
+              angry: 0,
+              sad: 0,
+              stressed: 0,
+              totalSubmissions: 0
+            }
+          })));
+          setShowSuggestions(true);
+          
+          // Update the map to show only filtered suburbs
+          if (map && filtered.length > 0) {
+            // Clear existing circles completely
+            console.log(`🗑️ Clearing ${suburbCircles.length} existing circles for search`);
+            suburbCircles.forEach(circle => {
+              circle.setMap(null);
+            });
+            setSuburbCircles([]);
+            
+            // Create new circles with filtered data only
+            console.log(`🆕 Creating ${filtered.length} circles for search results`);
+            const newCircles: google.maps.Circle[] = createSuburbSentimentCircles(map, filtered.map(name => ({
+              name,
+              center: getCoordinatesForSuburb(name),
+              radius: 500,
+              sentiment: 0.5,
+              description: `Suburb: ${name}`,
+              moodBreakdown: {
+                happy: 0,
+                neutral: 0,
+                angry: 0,
+                sad: 0,
+                stressed: 0,
+                totalSubmissions: 0
+              }
+            })));
+            setSuburbCircles(newCircles);
+            
+            // Update stats for filtered results
+            updateFilterStats(filtered.length, 0, filtered.length);
+          }
+        }
     }, 300);
 
     setSearchTimeout(newTimeout);
@@ -922,17 +763,22 @@ export default function SydneySensePage() {
     console.log("=== SELECT SUBURB DEBUG ===");
     console.log("Selecting suburb:", suburbName);
     console.log(
-      "Current suburbSentimentData length:",
-      suburbSentimentData.length
+      "Current suburbData length:",
+      suburbData.length
     );
     console.log("Current map state:", map ? "Available" : "Not available");
     console.log("Current suburbCircles length:", suburbCircles.length);
+
+    // Reset sentiment filter to "all" when selecting a specific suburb
+    const sentimentFilter = document.getElementById("sentimentFilter") as HTMLSelectElement;
+    if (sentimentFilter) {
+      sentimentFilter.value = "all";
+    }
 
     console.log("Calling filterBySuburb with:", suburbName);
     filterBySuburb(suburbName);
 
     setSuburbSearchTerm(suburbName);
-
     setShowSuggestions(false);
 
     const searchInput = document.querySelector(
@@ -948,6 +794,43 @@ export default function SydneySensePage() {
   const showMoodBreakdown = (suburbData: SuburbData) => {
     const moodBreakdownElement = document.getElementById("moodBreakdown");
     if (!moodBreakdownElement) {
+      return;
+    }
+
+    // Check if suburb has mood data
+    if (suburbData.moodBreakdown.totalSubmissions === 0) {
+      // Show message for suburbs without mood data
+      const happyBar = document.getElementById("happyBar");
+      const neutralBar = document.getElementById("neutralBar");
+      const angryBar = document.getElementById("angryBar");
+      const sadBar = document.getElementById("sadBar");
+      const stressedBar = document.getElementById("stressedBar");
+
+      if (happyBar) happyBar.style.width = "0%";
+      if (neutralBar) neutralBar.style.width = "0%";
+      if (angryBar) angryBar.style.width = "0%";
+      if (sadBar) sadBar.style.width = "0%";
+      if (stressedBar) stressedBar.style.width = "0%";
+
+      const happyPercentage = document.getElementById("happyPercentage");
+      const neutralPercentage = document.getElementById("neutralPercentage");
+      const angryPercentage = document.getElementById("angryPercentage");
+      const sadPercentage = document.getElementById("sadPercentage");
+      const stressedPercentage = document.getElementById("stressedPercentage");
+
+      if (happyPercentage) happyPercentage.textContent = "0%";
+      if (neutralPercentage) neutralPercentage.textContent = "0%";
+      if (angryPercentage) angryPercentage.textContent = "0%";
+      if (sadPercentage) sadPercentage.textContent = "0%";
+      if (stressedPercentage) stressedPercentage.textContent = "0%";
+
+      const totalSubmissions = document.getElementById("totalSubmissions");
+      if (totalSubmissions) totalSubmissions.textContent = "0";
+
+      moodBreakdownElement.style.display = "block";
+      setTimeout(() => {
+        moodBreakdownElement.style.opacity = "1";
+      }, 10);
       return;
     }
 
@@ -1142,7 +1025,7 @@ export default function SydneySensePage() {
   }, [isMapLoading, map, mapError]);
 
   const getTop3SuburbsByMood = (): SuburbData[] => {
-    const sortedSuburbs = [...suburbSentimentData].sort((a, b) => {
+    const sortedSuburbs = [...suburbData].sort((a, b) => {
       return b.moodBreakdown.happy - a.moodBreakdown.happy;
     });
 
@@ -1184,14 +1067,14 @@ export default function SydneySensePage() {
   };
 
   const getPieChartRotation = (moodType: string) => {
-    const totalSubmissions = suburbSentimentData.reduce(
+    const totalSubmissions = suburbData.reduce(
       (sum, suburb) => sum + suburb.moodBreakdown.totalSubmissions,
       0
     );
     if (totalSubmissions === 0) return 0;
 
     let totalMoodValue = 0;
-    suburbSentimentData.forEach((suburb) => {
+    suburbData.forEach((suburb) => {
       switch (moodType) {
         case "happy":
           totalMoodValue += suburb.moodBreakdown.happy;
@@ -1216,14 +1099,14 @@ export default function SydneySensePage() {
   };
 
   const getOverallMoodPercentage = (moodType: string) => {
-    const totalSubmissions = suburbSentimentData.reduce(
+    const totalSubmissions = suburbData.reduce(
       (sum, suburb) => sum + suburb.moodBreakdown.totalSubmissions,
       0
     );
     if (totalSubmissions === 0) return 0;
 
     let totalMoodValue = 0;
-    suburbSentimentData.forEach((suburb) => {
+    suburbData.forEach((suburb) => {
       switch (moodType) {
         case "happy":
           totalMoodValue +=
@@ -1259,7 +1142,7 @@ export default function SydneySensePage() {
   };
 
   const getPieChartGradient = () => {
-    const totalSubmissions = suburbSentimentData.reduce(
+    const totalSubmissions = suburbData.reduce(
       (sum, suburb) => sum + suburb.moodBreakdown.totalSubmissions,
       0
     );
@@ -1272,7 +1155,7 @@ export default function SydneySensePage() {
     let totalSad = 0;
     let totalStressed = 0;
 
-    suburbSentimentData.forEach((suburb) => {
+    suburbData.forEach((suburb) => {
       totalHappy +=
         (suburb.moodBreakdown.happy / 100) *
         suburb.moodBreakdown.totalSubmissions;
@@ -1337,7 +1220,7 @@ export default function SydneySensePage() {
   };
 
   const validateMoodPercentages = () => {
-    suburbSentimentData.forEach((suburb, index) => {
+    suburbData.forEach((suburb, index) => {
       const { happy, neutral, angry, sad, stressed } = suburb.moodBreakdown;
       const total = happy + neutral + angry + sad + stressed;
 
@@ -1367,7 +1250,50 @@ export default function SydneySensePage() {
     if (event.key === "Escape") {
       setShowSuggestions(false);
       setSuburbSearchTerm("");
-      setFilteredSuburbs(suburbSentimentData);
+      setFilteredSuburbs(suburbData);
+      // Reset to show all suburbs
+      filterBySuburb("all");
+    }
+  };
+
+  const resetAllFilters = () => {
+    console.log("🔄 Resetting all filters");
+    
+    // Reset sentiment filter dropdown
+    const sentimentFilter = document.getElementById("sentimentFilter") as HTMLSelectElement;
+    if (sentimentFilter) {
+      sentimentFilter.value = "all";
+    }
+    
+    // Reset search
+    setSuburbSearchTerm("");
+    setFilteredSuburbs(suburbData);
+    setShowSuggestions(false);
+    
+    // Reset map to show all suburbs
+    if (map) {
+      // Clear existing circles completely
+      console.log(`🗑️ Clearing ${suburbCircles.length} existing circles for reset`);
+      suburbCircles.forEach(circle => {
+        circle.setMap(null);
+      });
+      setSuburbCircles([]);
+      
+      // Create new circles with all data
+      console.log("🆕 Creating circles for all suburbs after reset");
+      const newCircles: google.maps.Circle[] = createSuburbSentimentCircles(map, suburbData);
+      setSuburbCircles(newCircles);
+      
+      // Reset map view
+      map.setCenter(SYDNEY_CENTER);
+      map.setZoom(14);
+      
+      // Hide mood breakdown
+      hideMoodBreakdown();
+      
+      // Update stats
+      const totalSentiment = suburbData.reduce((sum, suburb) => sum + suburb.sentiment, 0);
+      updateFilterStats(suburbData.length, totalSentiment, suburbData.length);
     }
   };
 
@@ -1586,7 +1512,7 @@ export default function SydneySensePage() {
                 <button
                   onClick={() => {
                     setSuburbSearchTerm("");
-                    setFilteredSuburbs(suburbSentimentData);
+                    setFilteredSuburbs(suburbData);
                     setShowSuggestions(false);
                     filterBySuburb("all");
                     const searchInput = document.querySelector(
@@ -1654,12 +1580,28 @@ export default function SydneySensePage() {
                 console.log("Show All clicked");
                 filterBySuburb("all");
                 setSuburbSearchTerm("");
-                setFilteredSuburbs(suburbSentimentData);
+                setFilteredSuburbs(suburbData);
                 setShowSuggestions(false);
               }}
               className={styles.showAllBtn}
             >
               Show All
+            </button>
+            <button
+              onClick={resetAllFilters}
+              className={styles.resetFiltersBtn}
+              style={{
+                marginTop: "8px",
+                padding: "6px 12px",
+                background: "#f5f5f5",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "12px",
+                width: "100%"
+              }}
+            >
+              Reset All Filters
             </button>
           </div>
 
