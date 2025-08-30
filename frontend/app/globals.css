@@ -222,6 +222,7 @@ Inspired by dashboard designs with proper spacing and visual hierarchy
 .page-layout-grid {
   @apply grid min-h-screen gap-4;
   grid-template-columns: 280px 1fr;
+  background-color: rgb(255, 255, 255);
 }
 
 /* 
@@ -426,11 +427,11 @@ Individual form elements with consistent spacing
 
 /* Form submit button  at the end of the form , !!!not the pop up */
 .form-submit-button {
-  @apply w-full bg-blue-600 hover:bg-blue-700 text-white mt-6;
+  @apply w-full bg-blue-600 hover:bg-green-700 text-white mt-6;
   background-color: rgb(21, 189, 105);
   font-family: "Inter", sans-serif;
   font-weight: 600;
-  font-size: 25px; 
+  font-size: 20px; 
   
 }
 

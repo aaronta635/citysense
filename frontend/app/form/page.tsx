@@ -477,7 +477,6 @@ export default function FeedbackPage() {
               <BarChart3 className="sidebar-menu-icon" />
               <span className="nav-bar-txt">Heat Map</span>
             </div>
-
             <div className="sidebar-menu-item current">
               <MessageSquare className="sidebar-menu-icon" />
               <span className="nav-bar-txt">Feedback</span>
@@ -582,7 +581,7 @@ export default function FeedbackPage() {
                     <div className="suburb-search-container">
                       <Input
                         type="text"
-                        placeholder="Search suburbs..."
+                        placeholder="Search Suburbs"
                         value={suburbSearch}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setSuburbSearch(e.target.value)
