@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Script from "next/script";
-import "../globals.css";
+import styles from "./page.module.css";
 import { GOOGLE_MAPS_API_KEY } from "./config";
 import { Users, Heart, MessageSquare, TrendingUp } from "lucide-react";
 
@@ -463,7 +463,7 @@ export default function SydneySensePage() {
   const [suburbCircles, setSuburbCircles] = useState<google.maps.Circle[]>([]);
   const [isMapLoading, setIsMapLoading] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
-  const [stats, setStats] = useState({ suburbsShown: 43, avgSentiment: "58%" });
+  const [stats, setStats] = useState({ suburbsShown: 0, avgSentiment: "0%" });
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [suburbSearchTerm, setSuburbSearchTerm] = useState("");
   const [filteredSuburbs, setFilteredSuburbs] = useState(suburbSentimentData);
@@ -480,16 +480,27 @@ export default function SydneySensePage() {
     console.log("New state will be:", !isDropdownOpen);
   };
 
-  // Close dropdown when clicking outside
+  // Enhanced suburb search with debouncing
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
+    null
+  );
+
+  // Enhanced click outside handler for all dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
+
+      // Check for activity dropdown
       if (!target.closest(".activity-dropdown")) {
         setIsDropdownOpen(false);
       }
-      if (!target.closest(".search-input-container")) {
+
+      // Enhanced search suggestions handling
+      if (!target.closest(`[class*="searchInputContainer"]`)) {
         setShowSuggestions(false);
       }
+
+      // Check for profile dropdown
       if (!target.closest(".profile-dropdown")) {
         setIsProfileOpen(false);
       }
@@ -588,13 +599,30 @@ export default function SydneySensePage() {
       const circles = createSuburbSentimentCircles(newMap);
       setSuburbCircles(circles);
 
+      // Ensure circles are properly initialized and interactive
+      setTimeout(() => {
+        if (circles.length > 0) {
+          console.log(
+            `Successfully created ${circles.length} interactive suburb circles`
+          );
+        }
+      }, 100);
+
       // Initialize with all suburbs visible and update stats
-      updateFilterStats(11, 5.8, 11);
+      // Calculate actual stats from the data
+      const totalSuburbs = suburbSentimentData.length;
+      const totalSentiment = suburbSentimentData.reduce(
+        (sum, suburb) => sum + suburb.sentiment,
+        0
+      );
+      const averageSentiment = totalSentiment / totalSuburbs;
+
+      // Pass the correct values: visibleCount, totalSentiment, visibleSuburbs
+      updateFilterStats(totalSuburbs, totalSentiment, totalSuburbs);
 
       // Add map controls for user interaction
       addMapControls(newMap);
 
-      console.log("Sydney map setup completed successfully");
       setIsMapLoading(false);
     } catch (error) {
       console.error("Error setting up Sydney map:", error);
@@ -629,40 +657,48 @@ export default function SydneySensePage() {
         suburb.moodBreakdown
       );
 
-      // Debug logging for angry suburbs
-      if (
-        suburb.moodBreakdown.angry > suburb.moodBreakdown.happy &&
-        suburb.moodBreakdown.angry > suburb.moodBreakdown.neutral &&
-        suburb.moodBreakdown.angry > suburb.moodBreakdown.sad &&
-        suburb.moodBreakdown.angry > suburb.moodBreakdown.stressed
-      ) {
-        console.log(`Angry suburb detected: ${suburb.name}`, {
-          angry: suburb.moodBreakdown.angry,
-          happy: suburb.moodBreakdown.happy,
-          neutral: suburb.moodBreakdown.neutral,
-          sad: suburb.moodBreakdown.sad,
-          stressed: suburb.moodBreakdown.stressed,
-          assignedColor: circleColor,
-        });
-      }
+      // Calculate dynamic transparency based on sentiment intensity and submission count
+      const baseOpacity = 0.2; // Minimum transparency
+      const sentimentIntensity =
+        Math.max(
+          suburb.moodBreakdown.happy,
+          suburb.moodBreakdown.neutral,
+          suburb.moodBreakdown.angry,
+          suburb.moodBreakdown.sad,
+          suburb.moodBreakdown.stressed
+        ) / 100; // Normalize to 0-1
+
+      // Higher sentiment intensity = more opaque, more submissions = more visible
+      const submissionFactor = Math.min(
+        suburb.moodBreakdown.totalSubmissions / 200,
+        1
+      ); // Normalize to 200 max submissions
+      const dynamicOpacity =
+        baseOpacity + sentimentIntensity * 0.4 + submissionFactor * 0.2;
+
+      // Clamp opacity between 0.2 and 0.8
+      const finalOpacity = Math.max(0.2, Math.min(0.8, dynamicOpacity));
 
       // Create a circle representing the suburb area
       const suburbCircle = new google.maps.Circle({
         center: suburb.center,
         radius: suburb.radius,
         fillColor: circleColor,
-        fillOpacity: 0.3, // Semi-transparent fill
+        fillOpacity: finalOpacity, // Dynamic transparency
         strokeColor: circleColor,
         strokeOpacity: 0.8,
         strokeWeight: 2,
         map: mapInstance,
       });
 
-      // Create info popup for when users click on a suburb
-      const suburbInfoPopup = createSuburbInfoPopup(suburb);
+      // Store original opacity and stroke color for hover effects
+      (suburbCircle as any).originalOpacity = finalOpacity;
+      (suburbCircle as any).originalStrokeColor = circleColor;
+
+      // No info popup needed - removed dropdown functionality
 
       // Make the suburb circle interactive
-      makeSuburbCircleInteractive(suburbCircle, suburbInfoPopup, mapInstance);
+      makeSuburbCircleInteractive(suburbCircle, mapInstance, suburb);
 
       // Store the circle for later use (showing/hiding)
       circles.push(suburbCircle);
@@ -672,53 +708,14 @@ export default function SydneySensePage() {
     return circles;
   };
 
-  // Create an info popup for a suburb
-  const createSuburbInfoPopup = (suburb: SuburbData) => {
-    return new google.maps.InfoWindow({
-      content: `
-        <div style="padding: 10px; min-width: 200px;">
-          <h3 style="margin: 0 0 8px 0; color: #2d5a2d;">${suburb.name}</h3>
-          <p style="margin: 0 0 8px 0; color: #666;">${suburb.description}</p>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-weight: bold; color: #333;">Sentiment Score:</span>
-            <span style="color: ${getSentimentColor(
-              suburb.sentiment,
-              suburb.moodBreakdown
-            )}; font-weight: bold;">
-              ${Math.round(suburb.sentiment * 100)}%
-            </span>
-          </div>
-        </div>
-      `,
-    });
-  };
-
   // Make a suburb circle interactive with click and hover effects
   const makeSuburbCircleInteractive = (
     circle: google.maps.Circle,
-    infoPopup: google.maps.InfoWindow,
-    mapInstance: google.maps.Map
+    mapInstance: google.maps.Map,
+    suburb: SuburbData
   ) => {
-    // Show info when clicked
-    circle.addListener("click", () => {
-      infoPopup.open(mapInstance, circle);
-    });
-
-    // Highlight on hover
-    circle.addListener("mouseover", () => {
-      circle.setOptions({
-        fillOpacity: 0.6, // More visible on hover
-        strokeWeight: 3, // Thicker border on hover
-      });
-    });
-
-    // Return to normal on mouse out
-    circle.addListener("mouseout", () => {
-      circle.setOptions({
-        fillOpacity: 0.3, // Back to semi-transparent
-        strokeWeight: 2, // Normal border thickness
-      });
-    });
+    // No hover effects - heat spots are static visual indicators
+    // No click functionality - heat spots are visual only
   };
 
   // Add map control buttons
@@ -764,6 +761,7 @@ export default function SydneySensePage() {
     visibleSuburbs: number
   ) => {
     if (visibleSuburbs > 0) {
+      // totalSentiment is the sum of sentiment scores (0-1), so convert to percentage
       const averageSentiment = Math.round(
         (totalSentiment / visibleSuburbs) * 100
       );
@@ -774,6 +772,18 @@ export default function SydneySensePage() {
     } else {
       setStats({ suburbsShown: 0, avgSentiment: "0%" });
     }
+  };
+
+  // Calculate initial stats from all suburbs data
+  const calculateInitialStats = () => {
+    const totalSuburbs = suburbSentimentData.length;
+    const totalSentiment = suburbSentimentData.reduce(
+      (sum, suburb) => sum + suburb.sentiment,
+      0
+    );
+    const averageSentiment = totalSentiment / totalSuburbs;
+
+    return { totalSuburbs, totalSentiment, averageSentiment };
   };
 
   // Filter suburbs based on selected mood
@@ -864,10 +874,22 @@ export default function SydneySensePage() {
 
   // Filter suburbs by specific suburb name
   const filterBySuburb = (selectedSuburb: string) => {
+    console.log("=== FILTER BY SUBURB DEBUG ===");
+    console.log("Filtering by suburb:", selectedSuburb);
+    console.log("Map state:", map ? "Available" : "Not available");
+    console.log("Suburb circles count:", suburbCircles.length);
+    console.log("suburbSentimentData length:", suburbSentimentData.length);
+
     let visibleCount = 0;
     let totalSentiment = 0;
     let visibleSuburbs = 0;
     let selectedSuburbData: SuburbData | null = null;
+
+    // Check if map and circles are available
+    if (!map || suburbCircles.length === 0) {
+      console.error("Map or suburb circles not available for filtering");
+      return;
+    }
 
     suburbCircles.forEach((circle, index) => {
       const suburb = suburbSentimentData[index];
@@ -879,6 +901,12 @@ export default function SydneySensePage() {
         shouldShow = suburb.name === selectedSuburb;
         if (shouldShow) {
           selectedSuburbData = suburb;
+          console.log(
+            "Found matching suburb:",
+            suburb.name,
+            "at index:",
+            index
+          );
         }
       }
 
@@ -895,48 +923,97 @@ export default function SydneySensePage() {
     // If a specific suburb is selected, center the map on it and show mood breakdown
     if (selectedSuburb !== "all" && selectedSuburbData && map) {
       const suburb = selectedSuburbData as SuburbData;
+      console.log("Selected suburb data:", suburb); // Debug log
+      console.log("Calling showMoodBreakdown for:", suburb.name); // Debug log
+
       map.setCenter(suburb.center);
       map.setZoom(16); // Zoom in closer to see the suburb better
       showMoodBreakdown(suburb);
     } else if (selectedSuburb === "all" && map) {
       // Return to default Sydney view
+      console.log("Returning to all suburbs view"); // Debug log
       map.setCenter(SYDNEY_CENTER);
       map.setZoom(14);
       hideMoodBreakdown();
+    } else {
+      console.log("=== NO MOOD BREAKDOWN SHOWN ===");
+      console.log("selectedSuburb:", selectedSuburb);
+      console.log("selectedSuburbData:", selectedSuburbData);
+      console.log("map:", map);
+      console.log("=== END DEBUG ===");
     }
 
     // Update the stats display
     updateFilterStats(visibleCount, totalSentiment, visibleSuburbs);
   };
 
-  // Handle suburb search
+  // Enhanced suburb search with debouncing
   const handleSuburbSearch = (searchTerm: string) => {
     setSuburbSearchTerm(searchTerm);
-    if (searchTerm.trim() === "") {
-      setFilteredSuburbs(suburbSentimentData);
-      setShowSuggestions(false);
-      // Show all suburbs when search is cleared
-      filterBySuburb("all");
-    } else {
-      const filtered = suburbSentimentData.filter((suburb) =>
-        suburb.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredSuburbs(filtered);
-      setShowSuggestions(true);
+
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
     }
+
+    // Debounce search for better performance
+    const newTimeout = setTimeout(() => {
+      if (searchTerm.trim() === "") {
+        setFilteredSuburbs(suburbSentimentData);
+        setShowSuggestions(false);
+        // Show all suburbs when search is cleared
+        filterBySuburb("all");
+      } else {
+        const filtered = suburbSentimentData.filter((suburb) =>
+          suburb.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredSuburbs(filtered);
+        setShowSuggestions(true);
+      }
+    }, 300); // 300ms debounce
+
+    setSearchTimeout(newTimeout);
   };
 
-  // Select suburb from search results
+  // Enhanced suburb selection with better UX
   const selectSuburb = (suburbName: string) => {
+    console.log("=== SELECT SUBURB DEBUG ===");
+    console.log("Selecting suburb:", suburbName);
+    console.log(
+      "Current suburbSentimentData length:",
+      suburbSentimentData.length
+    );
+    console.log("Current map state:", map ? "Available" : "Not available");
+    console.log("Current suburbCircles length:", suburbCircles.length);
+
+    // Filter the map to show only the selected suburb
+    console.log("Calling filterBySuburb with:", suburbName);
     filterBySuburb(suburbName);
+
+    // Update the search term to show what was selected
     setSuburbSearchTerm(suburbName);
-    setFilteredSuburbs(suburbSentimentData);
+
+    // Keep the filtered suburbs for the search suggestions
+    // Don't reset to all suburbs here
+    setShowSuggestions(false);
+
+    // Focus back to search input for better UX
+    const searchInput = document.querySelector(
+      `[class*="${styles.suburbSearchInput}"]`
+    ) as HTMLInputElement;
+    if (searchInput) {
+      searchInput.focus();
+    }
+
+    console.log("=== END SELECT SUBURB DEBUG ===");
   };
 
   // Show mood breakdown for a specific suburb
   const showMoodBreakdown = (suburbData: SuburbData) => {
     const moodBreakdownElement = document.getElementById("moodBreakdown");
-    if (!moodBreakdownElement) return;
+    if (!moodBreakdownElement) {
+      return;
+    }
 
     const breakdown = suburbData.moodBreakdown;
 
@@ -975,13 +1052,25 @@ export default function SydneySensePage() {
 
     // Show the mood breakdown section
     moodBreakdownElement.style.display = "block";
+    // Use setTimeout to ensure display: block is applied before opacity change
+    setTimeout(() => {
+      moodBreakdownElement.style.opacity = "1";
+    }, 10);
   };
 
   // Hide mood breakdown when showing all suburbs
   const hideMoodBreakdown = () => {
+    console.log("hideMoodBreakdown called"); // Debug log
+
     const moodBreakdown = document.getElementById("moodBreakdown");
     if (moodBreakdown) {
-      moodBreakdown.style.display = "none";
+      moodBreakdown.style.opacity = "0";
+      // Hide after opacity transition
+      setTimeout(() => {
+        moodBreakdown.style.display = "none";
+      }, 300);
+    } else {
+      console.error("Mood breakdown element not found for hiding");
     }
   };
 
@@ -1010,21 +1099,43 @@ export default function SydneySensePage() {
   // Handle Google Maps script load
   const handleScriptLoad = () => {
     console.log("Google Maps script loaded successfully");
-    // Initialize map after a short delay to ensure everything is ready
-    setTimeout(() => {
-      console.log("Checking Google Maps availability...");
-      console.log("typeof google:", typeof google);
-      console.log("google.maps:", google?.maps);
 
-      if (typeof google !== "undefined" && google.maps) {
-        console.log("Google Maps is available, initializing...");
-        initializeSydneyMap();
+    // Wait for Google Maps to be fully available
+    const checkGoogleMaps = () => {
+      if (typeof google !== "undefined" && google.maps && google.maps.Map) {
+        console.log("Google Maps is fully loaded and ready");
+        initializeMapWhenReady();
       } else {
-        console.error("Google Maps not available after script load");
-        setMapError("Google Maps failed to initialize");
+        console.log("Google Maps not fully ready yet, retrying...");
+        setTimeout(checkGoogleMaps, 100);
+      }
+    };
+
+    checkGoogleMaps();
+  };
+
+  // Initialize map when everything is ready
+  const initializeMapWhenReady = () => {
+    console.log("Attempting to initialize map...");
+    console.log("Map ref available:", !!mapRef.current);
+    console.log(
+      "Google Maps available:",
+      typeof google !== "undefined" && !!google?.maps
+    );
+
+    if (typeof google !== "undefined" && google.maps && mapRef.current) {
+      console.log("All requirements met, initializing Sydney map...");
+      try {
+        initializeSydneyMap();
+      } catch (error) {
+        console.error("Error initializing map:", error);
+        setMapError("Failed to initialize map");
         setIsMapLoading(false);
       }
-    }, 1000); // Increased delay to ensure script is fully loaded
+    } else {
+      console.log("Requirements not met yet, retrying in 200ms...");
+      setTimeout(initializeMapWhenReady, 200);
+    }
   };
 
   // Handle Google Maps script error
@@ -1069,6 +1180,50 @@ export default function SydneySensePage() {
     }, 5000);
 
     return () => clearTimeout(fallbackTimeout);
+  }, [isMapLoading, map, mapError]);
+
+  // Single consolidated initialization check
+  useEffect(() => {
+    if (
+      mapRef.current &&
+      typeof google !== "undefined" &&
+      google.maps &&
+      !map &&
+      !mapError &&
+      !isMapLoading
+    ) {
+      console.log("All requirements met, initializing map...");
+      initializeSydneyMap();
+    }
+  }, [mapRef.current, map, mapError, isMapLoading]);
+
+  // Single initialization check when component mounts
+  useEffect(() => {
+    const checkAndInitialize = () => {
+      if (
+        typeof google !== "undefined" &&
+        google.maps &&
+        mapRef.current &&
+        !map &&
+        !mapError &&
+        !isMapLoading
+      ) {
+        console.log("Component mounted, initializing map...");
+        initializeSydneyMap();
+        return true; // Successfully initialized
+      }
+      return false; // Not ready yet
+    };
+
+    // Check immediately
+    if (checkAndInitialize()) return;
+
+    // If not ready, check once more after a reasonable delay
+    const timeout = setTimeout(() => {
+      checkAndInitialize();
+    }, 1000);
+
+    return () => clearTimeout(timeout);
   }, [isMapLoading, map, mapError]);
 
   // Helper functions for ranking chart
@@ -1258,30 +1413,54 @@ export default function SydneySensePage() {
     validateMoodPercentages();
   }, []);
 
+  // Keyboard navigation for search suggestions
+  const handleSearchKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (event.key === "Escape") {
+      setShowSuggestions(false);
+      setSuburbSearchTerm("");
+      setFilteredSuburbs(suburbSentimentData);
+    }
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
+
   return (
-    <div className="dashboard">
+    <div className={styles.dashboard}>
       {/* Google Maps Script */}
       <Script
         src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=visualization`}
         onLoad={handleScriptLoad}
         onError={handleScriptError}
-        strategy="lazyOnload"
+        strategy="afterInteractive"
       />
 
       {/* Header */}
-      <header className="header">
-        <div className="logo">CitySense</div>
+      <header className={styles.header}>
+        <div className={styles.logo}>CitySense</div>
 
-        <div className="header-icons">
+        <div className={styles.headerIcons}>
           {/* Recent Activity Dropdown */}
-          <div className="activity-dropdown">
-            <button className="dropdown-trigger">
-              <svg className="icon" fill="currentColor" viewBox="0 0 20 20">
+          <div className={styles.activityDropdown}>
+            <button className={styles.dropdownTrigger}>
+              <svg
+                className={styles.icon}
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" />
               </svg>
               Recent Activity
               <svg
-                className="dropdown-arrow"
+                className={styles.dropdownArrow}
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -1293,57 +1472,71 @@ export default function SydneySensePage() {
               </svg>
             </button>
 
-            <div className="dropdown-menu">
-              <div className="dropdown-header">
+            <div className={styles.dropdownMenu}>
+              <div className={styles.dropdownHeader}>
                 <h4>Recent Activity</h4>
-                <span className="activity-count">3 new</span>
+                <span className={styles.activityCount}>3 new</span>
               </div>
 
-              <div className="dropdown-activities">
-                <div className="dropdown-activity-item">
-                  <div className="activity-dot green"></div>
-                  <div className="dropdown-activity-content">
-                    <div className="dropdown-activity-text">
+              <div className={styles.dropdownActivities}>
+                <div className={styles.dropdownActivityItem}>
+                  <div
+                    className={`${styles.activityDot} ${styles.green}`}
+                  ></div>
+                  <div className={styles.dropdownActivityContent}>
+                    <div className={styles.dropdownActivityText}>
                       New positive feedback in Downtown area
                     </div>
-                    <div className="dropdown-activity-time">2 minutes ago</div>
+                    <div className={styles.dropdownActivityTime}>
+                      2 minutes ago
+                    </div>
                   </div>
                 </div>
 
-                <div className="dropdown-activity-item">
-                  <div className="activity-dot yellow"></div>
-                  <div className="dropdown-activity-content">
-                    <div className="dropdown-activity-text">
+                <div className={styles.dropdownActivityItem}>
+                  <div
+                    className={`${styles.activityDot} ${styles.yellow}`}
+                  ></div>
+                  <div className={styles.dropdownActivityContent}>
+                    <div className={styles.dropdownActivityText}>
                       Neutral sentiment spike in Park District
                     </div>
-                    <div className="dropdown-activity-time">15 minutes ago</div>
+                    <div className={styles.dropdownActivityTime}>
+                      15 minutes ago
+                    </div>
                   </div>
                 </div>
 
-                <div className="dropdown-activity-item">
-                  <div className="activity-dot red"></div>
-                  <div className="dropdown-activity-content">
-                    <div className="dropdown-activity-text">
+                <div className={styles.dropdownActivityItem}>
+                  <div className={`${styles.activityDot} ${styles.red}`}></div>
+                  <div className={styles.dropdownActivityContent}>
+                    <div className={styles.dropdownActivityText}>
                       Concerns raised about traffic in Main St
                     </div>
-                    <div className="dropdown-activity-time">1 hour ago</div>
+                    <div className={styles.dropdownActivityTime}>
+                      1 hour ago
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="dropdown-footer">
-                <button className="view-all-btn">View All Activity</button>
+              <div className={styles.dropdownFooter}>
+                <button className={styles.viewAllBtn}>View All Activity</button>
               </div>
             </div>
           </div>
 
           {/* Profile Dropdown */}
-          <div className="profile-dropdown">
+          <div className={styles.profileDropdown}>
             <button
-              className="profile-trigger"
+              className={styles.profileTrigger}
               onClick={() => setIsProfileOpen(!isProfileOpen)}
             >
-              <svg className="icon" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className={styles.icon}
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path
                   fillRule="evenodd"
                   d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -1354,11 +1547,11 @@ export default function SydneySensePage() {
 
             {/* Profile Menu */}
             {isProfileOpen && (
-              <div className="profile-menu">
-                <div className="profile-header">
-                  <div className="profile-avatar">
+              <div className={styles.profileMenu}>
+                <div className={styles.profileHeader}>
+                  <div className={styles.profileAvatar}>
                     <svg
-                      className="profile-icon"
+                      className={styles.profileIcon}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -1369,16 +1562,18 @@ export default function SydneySensePage() {
                       ></path>
                     </svg>
                   </div>
-                  <div className="profile-info">
-                    <div className="profile-name">John Doe</div>
-                    <div className="profile-email">john.doe@example.com</div>
+                  <div className={styles.profileInfo}>
+                    <div className={styles.profileName}>John Doe</div>
+                    <div className={styles.profileEmail}>
+                      john.doe@example.com
+                    </div>
                   </div>
                 </div>
 
-                <div className="profile-options">
-                  <div className="profile-option logout">
+                <div className={styles.profileOptions}>
+                  <div className={`${styles.profileOption} ${styles.logout}`}>
                     <svg
-                      className="option-icon"
+                      className={styles.optionIcon}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -1397,13 +1592,13 @@ export default function SydneySensePage() {
         </div>
       </header>
       {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="filter-section">
+      <aside className={styles.sidebar}>
+        <div className={styles.filterSection}>
           <h3>Mood Filter</h3>
-          <div className="dropdown-container">
+          <div className={styles.dropdownContainer}>
             <select
               id="sentimentFilter"
-              className="sentiment-dropdown"
+              className={styles.sentimentDropdown}
               onChange={filterBySentiment}
             >
               <option value="all">All Moods</option>
@@ -1415,50 +1610,98 @@ export default function SydneySensePage() {
             </select>
           </div>
 
-          <div className="filter-info">
+          <div className={styles.filterInfo}>
             <p>Filter suburbs by community mood</p>
           </div>
 
-          <div className="color-legend"></div>
-        </div>
-
-        <div className="filter-section">
-          <h3>Suburb Filter</h3>
+          <h3 style={{ marginTop: "15px" }}>Suburb Filter</h3>
 
           {/* Combined Search and Dropdown */}
-          <div className="combined-filter-container">
+          <div className={styles.combinedFilterContainer}>
             {/* Search Input with Suggestions */}
-            <div className="search-input-container">
+            <div className={styles.searchInputContainer}>
               <input
                 type="text"
                 placeholder="Search suburbs..."
                 value={suburbSearchTerm}
                 onChange={(e) => handleSuburbSearch(e.target.value)}
-                onFocus={() => setShowSuggestions(true)}
-                className="suburb-search-input"
+                onFocus={() => {
+                  if (filteredSuburbs.length > 0) {
+                    setShowSuggestions(true);
+                  }
+                }}
+                onClick={() => {
+                  if (filteredSuburbs.length > 0) {
+                    setShowSuggestions(true);
+                  }
+                }}
+                onKeyDown={handleSearchKeyDown}
+                className={styles.suburbSearchInput}
               />
+              {suburbSearchTerm && (
+                <button
+                  onClick={() => {
+                    setSuburbSearchTerm("");
+                    setFilteredSuburbs(suburbSentimentData);
+                    setShowSuggestions(false);
+                    filterBySuburb("all");
+                    // Reset search input focus
+                    const searchInput = document.querySelector(
+                      `[class*="${styles.suburbSearchInput}"]`
+                    ) as HTMLInputElement;
+                    if (searchInput) {
+                      searchInput.focus();
+                    }
+                  }}
+                  className={styles.clearSearchBtn}
+                  title="Clear search"
+                >
+                  ×
+                </button>
+              )}
 
-              {/* Search Suggestions Dropdown */}
-              {showSuggestions && suburbSearchTerm && (
-                <div className="search-suggestions">
+              {showSuggestions && filteredSuburbs.length > 0 && (
+                <div className={styles.searchSuggestions}>
                   {filteredSuburbs.length > 0 ? (
-                    filteredSuburbs.map((suburb) => (
-                      <div
-                        key={suburb.name}
-                        className="suggestion-item"
-                        onClick={() => {
-                          selectSuburb(suburb.name);
-                          setShowSuggestions(false);
-                        }}
-                      >
-                        <span className="suggestion-name">{suburb.name}</span>
-                        <span className="suggestion-sentiment">
-                          {Math.round(suburb.sentiment * 100)}%
+                    <>
+                      <div className={styles.suggestionHeader}>
+                        <span>
+                          Found {filteredSuburbs.length} suburb
+                          {filteredSuburbs.length !== 1 ? "s" : ""}
                         </span>
                       </div>
-                    ))
+                      {filteredSuburbs.slice(0, 8).map((suburb) => (
+                        <div
+                          key={suburb.name}
+                          className={styles.suggestionItem}
+                          onClick={() => {
+                            selectSuburb(suburb.name);
+                            // Small delay to ensure click event processes before hiding
+                            setTimeout(() => {
+                              setShowSuggestions(false);
+                            }, 100);
+                          }}
+                        >
+                          <span className={styles.suggestionName}>
+                            {suburb.name}
+                          </span>
+                          <span className={styles.suggestionSentiment}>
+                            {Math.round(suburb.sentiment * 100)}%
+                          </span>
+                        </div>
+                      ))}
+                      {filteredSuburbs.length > 8 && (
+                        <div className={styles.suggestionFooter}>
+                          <span>... and {filteredSuburbs.length - 8} more</span>
+                        </div>
+                      )}
+                    </>
                   ) : (
-                    <div className="no-suggestions">No suburbs found</div>
+                    <div className={styles.noSuggestions}>
+                      <span>No suburbs found for "{suburbSearchTerm}"</span>
+                      <br />
+                      <small>Try a different search term</small>
+                    </div>
                   )}
                 </div>
               )}
@@ -1467,88 +1710,106 @@ export default function SydneySensePage() {
             {/* Show All Button */}
             <button
               onClick={() => {
+                console.log("Show All clicked"); // Debug log
                 filterBySuburb("all");
                 setSuburbSearchTerm("");
+                setFilteredSuburbs(suburbSentimentData);
+                setShowSuggestions(false);
               }}
-              className="show-all-btn"
+              className={styles.showAllBtn}
             >
               Show All
             </button>
           </div>
 
-          <div className="filter-info">
+          <div className={styles.filterInfo}>
             <p>Search to filter or scroll through the dropdown list</p>
           </div>
         </div>
 
-        <div className="stats-section">
+        <div className={styles.statsSection}>
           <h3>Current View</h3>
-          <div className="stat-item">
-            <span className="stat-label">Suburbs Shown:</span>
-            <span id="suburbsShown" className="stat-value">
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Suburbs Shown:</span>
+            <span id="suburbsShown" className={styles.statValue}>
               {stats.suburbsShown}
             </span>
           </div>
-          <div className="stat-item">
-            <span className="stat-label">Average Mood:</span>
-            <span id="avgSentiment" className="stat-value">
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Average Mood:</span>
+            <span id="avgSentiment" className={styles.statValue}>
               {stats.avgSentiment}
             </span>
           </div>
         </div>
 
         <div
-          className="mood-breakdown-section"
+          className={styles.moodBreakdownSection}
           id="moodBreakdown"
-          style={{ display: "none" }}
+          style={{ display: "none", opacity: "0" }}
         >
           <h3>Mood Breakdown</h3>
-          <div className="mood-bar">
-            <div className="mood-label">Happy 😊</div>
-            <div className="mood-bar-container">
-              <div className="mood-bar-fill happy" id="happyBar"></div>
+          <div className={styles.moodBar}>
+            <div className={styles.moodLabel}>Happy 😊</div>
+            <div className={styles.moodBarContainer}>
+              <div
+                className={`${styles.moodBarFill} ${styles.happy}`}
+                id="happyBar"
+              ></div>
             </div>
-            <div className="mood-percentage" id="happyPercentage">
+            <div className={styles.moodPercentage} id="happyPercentage">
               0%
             </div>
           </div>
-          <div className="mood-bar">
-            <div className="mood-label">Neutral 😐</div>
-            <div className="mood-bar-container">
-              <div className="mood-bar-fill neutral" id="neutralBar"></div>
+          <div className={styles.moodBar}>
+            <div className={styles.moodLabel}>Neutral 😐</div>
+            <div className={styles.moodBarContainer}>
+              <div
+                className={`${styles.moodBarFill} ${styles.neutral}`}
+                id="neutralBar"
+              ></div>
             </div>
-            <div className="mood-percentage" id="neutralPercentage">
+            <div className={styles.moodPercentage} id="neutralPercentage">
               0%
             </div>
           </div>
-          <div className="mood-bar">
-            <div className="mood-label">Angry 😠</div>
-            <div className="mood-bar-container">
-              <div className="mood-bar-fill angry" id="angryBar"></div>
+          <div className={styles.moodBar}>
+            <div className={styles.moodLabel}>Angry 😠</div>
+            <div className={styles.moodBarContainer}>
+              <div
+                className={`${styles.moodBarFill} ${styles.angry}`}
+                id="angryBar"
+              ></div>
             </div>
-            <div className="mood-percentage" id="angryPercentage">
+            <div className={styles.moodPercentage} id="angryPercentage">
               0%
             </div>
           </div>
-          <div className="mood-bar">
-            <div className="mood-label">Sad 😢</div>
-            <div className="mood-bar-container">
-              <div className="mood-bar-fill sad" id="sadBar"></div>
+          <div className={styles.moodBar}>
+            <div className={styles.moodLabel}>Sad 😢</div>
+            <div className={styles.moodBarContainer}>
+              <div
+                className={`${styles.moodBarFill} ${styles.sad}`}
+                id="sadBar"
+              ></div>
             </div>
-            <div className="mood-percentage" id="sadPercentage">
+            <div className={styles.moodPercentage} id="sadPercentage">
               0%
             </div>
           </div>
-          <div className="mood-bar">
-            <div className="mood-label">Stressed 😰</div>
-            <div className="mood-bar-container">
-              <div className="mood-bar-fill stressed" id="stressedBar"></div>
+          <div className={styles.moodBar}>
+            <div className={styles.moodLabel}>Stressed 😰</div>
+            <div className={styles.moodBarContainer}>
+              <div
+                className={`${styles.moodBarFill} ${styles.stressed}`}
+                id="stressedBar"
+              ></div>
             </div>
-            <div className="mood-percentage" id="stressedPercentage">
+            <div className={styles.moodPercentage} id="stressedPercentage">
               0%
             </div>
           </div>
-          <div className="total-submissions">
+          <div className={styles.totalSubmissions}>
             <span>Total Submissions: </span>
             <span id="totalSubmissions">0</span>
           </div>
@@ -1556,10 +1817,14 @@ export default function SydneySensePage() {
       </aside>
 
       {/* Main Content */}
-      <main className="main-content">
-        <div className="content-header">
-          <div className="content-title">
-            <svg className="icon" fill="currentColor" viewBox="0 0 20 20">
+      <main className={styles.mainContent}>
+        <div className={styles.contentHeader}>
+          <div className={styles.contentTitle}>
+            <svg
+              className={styles.icon}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
               <path
                 fillRule="evenodd"
                 d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
@@ -1599,8 +1864,12 @@ export default function SydneySensePage() {
           >
             Reload map
           </button>
-          <button className="hide-button" onClick={toggleSuburbOverlays}>
-            <svg className="icon" fill="currentColor" viewBox="0 0 20 20">
+          <button className={styles.hideButton} onClick={toggleSuburbOverlays}>
+            <svg
+              className={styles.icon}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
               <path
                 fillRule="evenodd"
                 d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -1611,7 +1880,7 @@ export default function SydneySensePage() {
           </button>
         </div>
 
-        <div className="map-container">
+        <div className={styles.mapContainer}>
           {isMapLoading && (
             <div
               style={{
@@ -1653,7 +1922,7 @@ export default function SydneySensePage() {
           <div
             ref={mapRef}
             id="map"
-            className="map"
+            className={styles.map}
             style={{
               width: "100%",
               height: "100%",
@@ -1665,57 +1934,59 @@ export default function SydneySensePage() {
       </main>
 
       {/* Right Panel */}
-      <aside className="right-panel">
-        <div className="panel-section">
+      <aside className={styles.rightPanel}>
+        <div className={styles.panelSection}>
           <h3>Key Metrics</h3>
-          <div className="metric-item">
-            <Heart className="metric-icon" />
-            <div className="metric-content">
+          <div className={styles.metricItem}>
+            <Heart className={styles.metricIcon} />
+            <div className={styles.metricContent}>
               <h4>Overall Sentiment</h4>
-              <div className="metric-value">
-                72% <span className="positive">Positive</span>
+              <div className={`${styles.metricValue} ${styles.positive}`}>
+                72% <span className={styles.positive}>Positive</span>
               </div>
             </div>
           </div>
-          <div className="metric-item">
-            <Users className="metric-icon" />
-            <div className="metric-content">
+          <div className={styles.metricItem}>
+            <Users className={styles.metricIcon} />
+            <div className={styles.metricContent}>
               <h4>Active Residents</h4>
-              <div className="metric-value">1,247</div>
+              <div className={styles.metricValue}>1,247</div>
             </div>
           </div>
-          <div className="metric-item">
-            <MessageSquare className="metric-icon" />
-            <div className="metric-content">
+          <div className={styles.metricItem}>
+            <MessageSquare className={styles.metricIcon} />
+            <div className={styles.metricContent}>
               <h4>Total Comments</h4>
-              <div className="metric-value">3,891</div>
+              <div className={styles.metricValue}>3,891</div>
             </div>
           </div>
-          <div className="metric-item">
-            <TrendingUp className="metric-icon" />
-            <div className="metric-content">
+          <div className={styles.metricItem}>
+            <TrendingUp className={styles.metricIcon} />
+            <div className={styles.metricContent}>
               <h4>Weekly Growth</h4>
-              <div className="metric-value">
-                <span className="growth">+12%</span>
+              <div className={styles.metricValue}>
+                <span className={styles.growth}>+12%</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Top 3 Suburbs Ranking Chart */}
-        <div className="panel-section">
+        <div className={styles.panelSection}>
           <h3>Top 3 Suburbs by Happy Mood</h3>
-          <div className="ranking-chart">
+          <div className={styles.rankingChart}>
             {getTop3SuburbsByMood().map((suburb, index) => (
               <div
                 key={suburb.name}
-                className={`ranking-item rank-${index + 1}`}
+                className={`${styles.rankingItem} ${
+                  styles[`rank${index + 1}`]
+                }`}
               >
-                <div className="rank-number">{index + 1}</div>
-                <div className="rank-content">
-                  <div className="rank-suburb-name">{suburb.name}</div>
-                  <div className="rank-mood-info">
-                    <span className="rank-sentiment">
+                <div className={styles.rankNumber}>{index + 1}</div>
+                <div className={styles.rankContent}>
+                  <div className={styles.rankSuburbName}>{suburb.name}</div>
+                  <div className={styles.rankMoodInfo}>
+                    <span className={styles.rankSentiment}>
                       {Math.round(suburb.sentiment * 100)}%
                     </span>
                   </div>
@@ -1727,7 +1998,7 @@ export default function SydneySensePage() {
       </aside>
 
       {/* Call to Action Button */}
-      <button className="cta-button" title="Submit Feedback">
+      <button className={styles.ctaButton} title="Submit Feedback">
         <svg
           width="20"
           height="20"
@@ -1745,13 +2016,13 @@ export default function SydneySensePage() {
       </button>
 
       {/* Mood Statistics Hover Button */}
-      <div className="mood-stats-button-container">
+      <div className={styles.moodStatsButtonContainer}>
         <button
-          className="mood-stats-button"
+          className={styles.moodStatsButton}
           onMouseEnter={() => setShowMoodStats(true)}
           onMouseLeave={() => setShowMoodStats(false)}
         >
-          <svg className="icon" fill="currentColor" viewBox="0 0 20 20">
+          <svg className={styles.icon} fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
               d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
@@ -1762,15 +2033,15 @@ export default function SydneySensePage() {
 
         {/* Mood Statistics Popup */}
         {showMoodStats && (
-          <div className="mood-stats-popup">
-            <div className="popup-header">
+          <div className={styles.moodStatsPopup}>
+            <div className={styles.popupHeader}>
               <h3>Overall Mood Distribution</h3>
-              <span className="popup-subtitle">All Sydney Suburbs</span>
+              <span className={styles.popupSubtitle}>All Sydney Suburbs</span>
             </div>
 
-            <div className="pie-chart-container">
+            <div className={styles.pieChartContainer}>
               <div
-                className="pie-chart"
+                className={styles.pieChart}
                 style={{
                   background: `conic-gradient(${getPieChartGradient()})`,
                 }}
@@ -1779,25 +2050,29 @@ export default function SydneySensePage() {
               </div>
             </div>
 
-            <div className="mood-legend">
-              <div className="legend-item">
-                <div className="legend-color happy"></div>
+            <div className={styles.moodLegend}>
+              <div className={styles.legendItem}>
+                <div className={`${styles.legendColor} ${styles.happy}`}></div>
                 <span>Happy: {getOverallMoodPercentage("happy")}%</span>
               </div>
-              <div className="legend-item">
-                <div className="legend-color neutral"></div>
+              <div className={styles.legendItem}>
+                <div
+                  className={`${styles.legendColor} ${styles.neutral}`}
+                ></div>
                 <span>Neutral: {getOverallMoodPercentage("neutral")}%</span>
               </div>
-              <div className="legend-item">
-                <div className="legend-color angry"></div>
+              <div className={styles.legendItem}>
+                <div className={`${styles.legendColor} ${styles.angry}`}></div>
                 <span>Angry: {getOverallMoodPercentage("angry")}%</span>
               </div>
-              <div className="legend-item">
-                <div className="legend-color sad"></div>
+              <div className={styles.legendItem}>
+                <div className={`${styles.legendColor} ${styles.sad}`}></div>
                 <span>Sad: {getOverallMoodPercentage("sad")}%</span>
               </div>
-              <div className="legend-item">
-                <div className="legend-color stressed"></div>
+              <div className={styles.legendItem}>
+                <div
+                  className={`${styles.legendColor} ${styles.stressed}`}
+                ></div>
                 <span>Stressed: {getOverallMoodPercentage("stressed")}%</span>
               </div>
             </div>
