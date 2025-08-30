@@ -75,7 +75,11 @@ Inter font family with various weights and styles
 Custom CSS variables for consistent theming across the feedback form
 Inspired by modern dashboard designs with blue and green accent colors
 */
-
+.nav-bar-txt { 
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 25px;
+}
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
