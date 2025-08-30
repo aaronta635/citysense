@@ -23,11 +23,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="mx-auto h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center">
+          <div className="mx-auto h-12 w-12 bg-green-600 rounded-full flex items-center justify-center">
             <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
@@ -55,7 +55,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  className="h-11 border-gray-300 focus:border-green-500 focus:ring-green-500"
                 />
               </div>
 
@@ -71,7 +71,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  className="h-11 border-gray-300 focus:border-green-500 focus:ring-green-500"
                 />
               </div>
 
@@ -81,7 +81,7 @@ export default function LoginPage() {
                   <input
                     id="remember"
                     type="checkbox"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                   />
                   <Label htmlFor="remember" className="text-sm text-gray-600">
                     Remember me
@@ -90,7 +90,7 @@ export default function LoginPage() {
                 <Button
                   type="button"
                   variant="link"
-                  className="text-sm text-blue-600 hover:text-blue-700 p-0 h-auto"
+                  className="text-sm text-green-600 hover:text-green-700 p-0 h-auto"
                 >
                   Forgot password?
                 </Button>
@@ -100,7 +100,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                className="w-full h-11 bg-green-600 hover:bg-green-700 text-white font-medium"
               >
                 {isLoading ? (
                   <div className="flex items-center space-x-2">
@@ -121,7 +121,7 @@ export default function LoginPage() {
             Don&apos;t have an account?{" "}
             <Button
               variant="link"
-              className="text-blue-600 hover:text-blue-700 p-0 h-auto font-medium"
+              className="text-green-600 hover:text-green-700 p-0 h-auto font-medium"
             >
               Sign up
             </Button>

@@ -135,10 +135,6 @@ export default function FeedbackPage() {
               <BarChart3 className="sidebar-menu-icon" />
               <span>Heat Map</span>
             </div>
-            <div className="sidebar-menu-item">
-              <Users className="sidebar-menu-icon" />
-              <span>Analytics</span>
-            </div>
             <div className="sidebar-menu-item current">
               <MessageSquare className="sidebar-menu-icon" />
               <span>Feedback</span>
