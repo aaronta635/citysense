@@ -63,10 +63,15 @@ const analyzeCity = catchAsync(async (req, res) => {
   const weather = await weatherService.getCurrentWeather(suburb);
   const pollution = await pollutionService.getCurrentPollution(suburb);
 
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
   const moods = await Mood.findAll({
-    where: { suburb },
+    where: {
+      suburb,
+      createdAt: { [Op.gte]: startOfToday }
+    },
     order: [['createdAt', 'DESC']],
-    limit: 50
   });
 
   const formattedMoods = moods.map(m => ({
@@ -84,7 +89,7 @@ const analyzeCity = catchAsync(async (req, res) => {
       analysis: {
         complaints: {},
         positives: {},
-        newsfeed: ["⚠️ No mood submissions yet for this suburb."]
+        newsfeed: ["⚠️ No mood submissions yet for today."]
       }
     });
   }
@@ -94,8 +99,7 @@ const analyzeCity = catchAsync(async (req, res) => {
   const enhancedNewsfeed = [];
   for (const line of aiResult.newsfeed) {
     const sentiment = line.includes("[NEGATIVE]") ? "NEGATIVE" : "POSITIVE";
-    const cleanLine = line.replace(/^[🌟📰]\s*\[[^\]]+\]\s*/, ""); // bỏ prefix
-    const headline = await generateNewsHeadline(cleanLine, weather, pollution, sentiment);
+    const headline = await generateNewsHeadline(line, weather, pollution, sentiment);
     enhancedNewsfeed.push(headline);
   }
   aiResult.newsfeed = enhancedNewsfeed;
@@ -118,14 +122,19 @@ const analyzeAll = catchAsync(async (req, res) => {
   const suburbList = suburbs.map(s => s.suburb);
   const resultsBySuburb = {};
 
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
   for (const suburb of suburbList) {
     const weather = await weatherService.getCurrentWeather(suburb);
     const pollution = await pollutionService.getCurrentPollution(suburb);
 
     const moods = await Mood.findAll({
-      where: { suburb },
+      where: {
+        suburb,
+        createdAt: { [Op.gte]: startOfToday }
+      },
       order: [['createdAt', 'DESC']],
-      limit: 50
     });
 
     const formattedMoods = moods.map(m => ({
@@ -138,7 +147,7 @@ const analyzeAll = catchAsync(async (req, res) => {
       resultsBySuburb[suburb] = {
         complaints: {},
         positives: {},
-        newsfeed: ["⚠️ No mood submissions yet for this suburb."]
+        newsfeed: ["⚠️ No mood submissions yet for today."]
       };
     } else {
       const aiResult = await aiService.runPythonAI(weather, pollution, formattedMoods);
@@ -146,12 +155,11 @@ const analyzeAll = catchAsync(async (req, res) => {
       const enhancedNewsfeed = [];
       for (const line of aiResult.newsfeed) {
         const sentiment = line.includes("[NEGATIVE]") ? "NEGATIVE" : "POSITIVE";
-        const cleanLine = line.replace(/^[🌟📰]\s*\[[^\]]+\]\s*/, "");
-        const headline = await generateNewsHeadline(cleanLine, weather, pollution, sentiment);
+        const headline = await generateNewsHeadline(line, weather, pollution, sentiment);
         enhancedNewsfeed.push(headline);
       }
-      aiResult.newsfeed = enhancedNewsfeed;
 
+      aiResult.newsfeed = enhancedNewsfeed;
       resultsBySuburb[suburb] = aiResult;
     }
   }
