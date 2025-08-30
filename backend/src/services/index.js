@@ -1,4 +1,4 @@
-module.exports.authService = require('./auth.service');
-module.exports.emailService = require('./email.service');
-module.exports.tokenService = require('./token.service');
-module.exports.userService = require('./user.service');
+// Services will be added here as needed for CitySense
+// module.exports.weatherService = require('./weather.service');
+// module.exports.pollutionService = require('./pollution.service');
+// module.exports.moodService = require('./mood.service');

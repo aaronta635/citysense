@@ -1,2 +1,2 @@
-module.exports.authController = require('./auth.controller');
-module.exports.userController = require('./user.controller');
+// Controllers will be added here as needed for CitySense
+// module.exports.citysenseController = require('./citysense.controller');

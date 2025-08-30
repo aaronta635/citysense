@@ -1,39 +1,19 @@
 const express = require('express');
-const authRoute = require('./auth.route');
-const userRoute = require('./user.route');
+const citysenseRoute = require('./citysense.route');
 const docsRoute = require('./docs.route');
-const config = require('../../config/config');
 
 const router = express.Router();
 
-const defaultRoutes = [
-  {
-    path: '/auth',
-    route: authRoute,
-  },
-  {
-    path: '/users',
-    route: userRoute,
-  },
-];
-
-const devRoutes = [
-  // routes available only in development mode
-  {
-    path: '/docs',
-    route: docsRoute,
-  },
-];
-
-defaultRoutes.forEach((route) => {
-  router.use(route.path, route.route);
+// Simple health check route
+router.get('/health', (req, res) => {
+  res.json({ status: 'OK', message: 'CitySense API is running' });
 });
 
-/* istanbul ignore next */
-if (config.env === 'development') {
-  devRoutes.forEach((route) => {
-    router.use(route.path, route.route);
-  });
-}
+// CitySense routes
+router.use('/citysense', citysenseRoute);
+
+// API docs
+router.use('/docs', docsRoute);
+
 
 module.exports = router;

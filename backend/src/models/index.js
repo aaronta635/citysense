@@ -1,2 +1,3 @@
-module.exports.Token = require('./token.model');
-module.exports.User = require('./user.model');
+// Models will be added here as needed for CitySense
+// module.exports.Weather = require('./weather.model');
+// module.exports.Pollution = require('./pollution.model');
