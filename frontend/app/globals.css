@@ -78,7 +78,7 @@ Inspired by modern dashboard designs with blue and green accent colors
 .nav-bar-txt { 
   font-family: "Inter", sans-serif;
   font-weight: 700;
-  font-size: 25px;
+  color: rgb(0,0,0);
 }
 :root {
   --background: oklch(1 0 0);
@@ -288,6 +288,9 @@ Right side content with header and form
 
 .submit-feedback-button {
   @apply bg-green-600 hover:bg-green-700 text-white;
+  background-color: #4caf50; 
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
 }
 
 .button-icon {
@@ -316,11 +319,17 @@ Main form container with proper spacing
 }
 
 .form-card-title {
-  @apply text-xl font-semibold text-blue-900;
+  @apply text-xl font-semibold ;
+  color: rgb(21, 189, 105);
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
 }
 
 .form-card-description {
   @apply text-blue-700;
+  color: rgb(21, 189, 105);
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
 }
 
 .form-card-content {
@@ -431,6 +440,9 @@ Right sidebar with key metrics display
 
 .metrics-card-title {
   @apply text-lg font-semibold text-gray-900;
+  color: rgb(21, 189, 105);
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
 }
 
 .metrics-card-content {
