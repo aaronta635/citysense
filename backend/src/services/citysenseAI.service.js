@@ -15,7 +15,6 @@ const runPythonAI = async (weather, air, moods) => {
     });
 
     py.stderr.on('data', (err) => {
-      // log warnings but don't immediately reject
       console.error('Python stderr:', err.toString());
       error += err.toString();
     });

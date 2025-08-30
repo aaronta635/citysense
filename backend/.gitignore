@@ -12,6 +12,11 @@ yarn-error.log
 # Code coverage
 coverage
 
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
 node_modules/
 my-app/
 .DS_Store

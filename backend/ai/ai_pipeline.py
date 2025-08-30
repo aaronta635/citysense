@@ -40,12 +40,20 @@ def cluster_and_autolabel(df, num_clusters=2):
         return df
 
     embeddings = embedder.encode(misc_df["message"].tolist(), convert_to_tensor=False)
+
     kmeans = KMeans(n_clusters=min(num_clusters, len(misc_df)), random_state=42)
     labels = kmeans.fit_predict(embeddings)
 
     for cluster_id in set(labels):
         cluster_idx = misc_df.index[labels == cluster_id]
-        representative_msg = misc_df.loc[cluster_idx[0], "message"]
+        cluster_embs = [embeddings[i] for i, idx in enumerate(misc_df.index) if labels[i] == cluster_id]
+
+        centroid = kmeans.cluster_centers_[cluster_id]
+
+        distances = [((e - centroid) ** 2).sum() for e in cluster_embs]
+        best_idx = cluster_idx[distances.index(min(distances))]
+        representative_msg = misc_df.loc[best_idx, "message"]
+
         label_result = topic_model(representative_msg, EXTENDED_TOPICS)
         new_label = label_result["labels"][0]
 
