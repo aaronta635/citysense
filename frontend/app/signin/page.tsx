@@ -25,25 +25,25 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="full-screen-container">
-      <div className="signin-form-wrapper">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-8">
         {/* Header */}
-        <div className="welcome-header">
-          <h1 className="welcome-title">Welcome Back</h1>
-          <p className="welcome-subtitle">Sign in to your account to continue</p>
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-medium text-gray-600 text-balance">Welcome Back</h1>
+          <p className="text-gray-500 text-lg">Sign in to your account to continue</p>
         </div>
 
         {/* Sign In Card */}
-        <Card className="signin-card">
-          <CardHeader className="signin-card-header">
-            <CardTitle className="signin-card-title">Sign In</CardTitle>
-            <p className="signin-card-description">Enter your credentials to access your account</p>
+        <Card className="bg-white border-gray-200 shadow-sm">
+          <CardHeader className="text-center pb-4">
+            <CardTitle className="text-2xl font-medium text-gray-600">Sign In</CardTitle>
+            <p className="text-gray-500 text-sm">Enter your credentials to access your account</p>
           </CardHeader>
-          <CardContent className="signin-form-content">
-            <form onSubmit={handleSubmit} className="signin-form">
+          <CardContent className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Username Field */}
-              <div className="input-field-group">
-                <Label htmlFor="username" className="input-field-label">
+              <div className="space-y-2">
+                <Label htmlFor="username" className="text-gray-600 font-normal">
                   Username
                 </Label>
                 <Input
@@ -52,16 +52,16 @@ export default function SignInPage() {
                   placeholder="Enter your username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="text-input-field"
+                  className="h-12 bg-gray-50 border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-gray-300"
                 />
               </div>
 
               {/* Password Field */}
-              <div className="input-field-group">
-                <Label htmlFor="password" className="input-field-label">
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-gray-600 font-normal">
                   Password
                 </Label>
-                <div className="password-field-container">
+                <div className="relative">
                   <Input
                     id="password"
                     type="password"
@@ -73,25 +73,30 @@ export default function SignInPage() {
                         setShowPasswordError(false)
                       }
                     }}
-                    className="text-input-field"
+                    className="h-12 bg-gray-50 border-gray-200 text-gray-700 placeholder:text-gray-400 focus:bg-white focus:border-gray-300"
                   />
                   {showPasswordError && (
-                    <div className="validation-error-tooltip">
-                      <div className="error-message-box">Please fill out this field.</div>
+                    <div className="absolute -bottom-8 left-0">
+                      <div className="bg-white border border-gray-300 rounded px-3 py-1 text-sm text-gray-600 shadow-sm">
+                        Please fill out this field.
+                      </div>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Forgot Password Link */}
-              <div className="forgot-password-container">
-                <button type="button" className="forgot-password-link">
+              <div className="text-left">
+                <button type="button" className="text-cyan-600 hover:text-cyan-700 text-sm font-normal">
                   Forgot password?
                 </button>
               </div>
 
               {/* Sign In Button */}
-              <Button type="submit" className="signin-submit-button">
+              <Button
+                type="submit"
+                className="w-full h-12 bg-cyan-600 hover:bg-cyan-700 text-white font-normal text-base"
+              >
                 Sign In
               </Button>
             </form>
@@ -99,9 +104,10 @@ export default function SignInPage() {
         </Card>
 
         {/* Sign Up Link */}
-        <div className="signup-link-container">
-          <p className="signup-link-text">
-            Don't have an account? <button className="signup-link-button">Sign up here</button>
+        <div className="text-center">
+          <p className="text-gray-500">
+            Don&apos;t have an account?{" "}
+            <button className="text-cyan-600 hover:text-cyan-700 font-normal">Sign up here</button>
           </p>
         </div>
       </div>

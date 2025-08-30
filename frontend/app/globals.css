@@ -3,12 +3,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* 
-=== DESIGN SYSTEM VARIABLES ===
-Custom CSS variables for consistent theming across the feedback form
-Inspired by modern dashboard designs with blue and green accent colors
-*/
-
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -43,11 +37,6 @@ Inspired by modern dashboard designs with blue and green accent colors
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-
-  /* Custom feedback form colors */
-  --feedback-primary: oklch(0.5 0.2 220); /* Modern blue */
-  --feedback-secondary: oklch(0.6 0.15 160); /* Soft green */
-  --feedback-accent: oklch(0.7 0.1 200); /* Light blue accent */
 }
 
 .dark {
@@ -135,314 +124,164 @@ Inspired by modern dashboard designs with blue and green accent colors
   }
 }
 
-/* 
-=== FEEDBACK FORM CUSTOM STYLES ===
-Modern, clean styling for the feedback form with readable class names
-Inspired by dashboard designs with proper spacing and visual hierarchy
-*/
-
-/* Main page container - full height layout */
-.feedback-page-container {
-  @apply min-h-screen bg-gray-50;
+.full-screen-container {
+  min-height: 100vh;
+  background-color: rgb(249 250 251);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
 }
 
-/* Grid layout for sidebar and main content */
-/* Fixed the grid layout to use proper Tailwind syntax */
-.page-layout-grid {
-  @apply grid min-h-screen gap-4;
-  grid-template-columns: 280px 1fr;
+.signin-form-wrapper {
+  width: 100%;
+  max-width: 28rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-/* 
-=== SIDEBAR NAVIGATION STYLES ===
-Left sidebar with navigation menu items
-*/
-.sidebar-navigation {
-  @apply bg-white border-r border-gray-200 p-6;
+.welcome-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.sidebar-header {
-  @apply mb-8;
+.welcome-title {
+  font-size: 2.25rem;
+  font-weight: 500;
+  color: rgb(75 85 99);
+  text-wrap: balance;
 }
 
-.sidebar-brand-title {
-  @apply text-2xl font-bold text-blue-600;
+.welcome-subtitle {
+  color: rgb(107 114 128);
+  font-size: 1.125rem;
 }
 
-.sidebar-menu {
-  @apply space-y-2;
+.signin-card {
+  background-color: white;
+  border: 1px solid rgb(229 231 235);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-.sidebar-menu-item {
-  @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer transition-colors;
+.signin-card-header {
+  text-align: center;
+  padding-bottom: 1rem;
 }
 
-.sidebar-menu-item.current {
-  @apply bg-blue-50 text-blue-600 border border-blue-200;
+.signin-card-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: rgb(75 85 99);
 }
 
-.sidebar-menu-icon {
-  @apply w-5 h-5;
+.signin-card-description {
+  color: rgb(107 114 128);
+  font-size: 0.875rem;
 }
 
-/* 
-=== MAIN CONTENT AREA STYLES ===
-Right side content with header and form
-*/
-.main-content-area {
-  @apply p-8 overflow-auto;
+.signin-form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.page-header-section {
-  @apply flex items-center justify-between mb-8;
+.signin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.page-title-container {
-  @apply space-y-1;
+.input-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.page-main-title {
-  @apply text-3xl font-bold text-gray-900;
+.input-field-label {
+  color: rgb(75 85 99);
+  font-weight: 400;
 }
 
-.page-subtitle {
-  @apply text-gray-600;
+.text-input-field {
+  height: 3rem;
+  background-color: rgb(249 250 251);
+  border: 1px solid rgb(229 231 235);
+  color: rgb(55 65 81);
 }
 
-.submit-feedback-button {
-  @apply bg-green-600 hover:bg-green-700 text-white;
+.text-input-field::placeholder {
+  color: rgb(156 163 175);
 }
 
-.button-icon {
-  @apply w-4 h-4 mr-2;
+.text-input-field:focus {
+  background-color: white;
+  border-color: rgb(209 213 219);
 }
 
-/* 
-=== CONTENT GRID LAYOUT ===
-Two-column layout for form and metrics
-*/
-.content-grid-layout {
-  @apply grid gap-8;
-  grid-template-columns: 2fr 1fr;
+.password-field-container {
+  position: relative;
 }
 
-/* 
-=== FEEDBACK FORM CARD STYLES ===
-Main form container with proper spacing
-*/
-.feedback-form-card {
-  @apply shadow-sm border border-gray-200;
+.validation-error-tooltip {
+  position: absolute;
+  bottom: -2rem;
+  left: 0;
 }
 
-.form-card-header {
-  @apply bg-blue-50 border-b border-blue-100;
+.error-message-box {
+  background-color: white;
+  border: 1px solid rgb(209 213 219);
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  color: rgb(75 85 99);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-.form-card-title {
-  @apply text-xl font-semibold text-blue-900;
+.forgot-password-container {
+  text-align: left;
 }
 
-.form-card-description {
-  @apply text-blue-700;
+.forgot-password-link {
+  color: rgb(8 145 178);
+  font-size: 0.875rem;
+  font-weight: 400;
 }
 
-.form-card-content {
-  @apply p-6;
+.forgot-password-link:hover {
+  color: rgb(14 116 144);
 }
 
-.feedback-form {
-  @apply space-y-6;
+.signin-submit-button {
+  width: 100%;
+  height: 3rem;
+  background-color: rgb(8 145 178);
+  color: white;
+  font-weight: 400;
+  font-size: 1rem;
 }
 
-/* 
-=== FORM FIELD STYLES ===
-Individual form elements with consistent spacing
-*/
-.form-field-group {
-  @apply space-y-2;
+.signin-submit-button:hover {
+  background-color: rgb(14 116 144);
 }
 
-.form-field-label {
-  @apply text-sm font-medium text-gray-700;
+.signup-link-container {
+  text-align: center;
 }
 
-/* Mood selection dropdown styles */
-.mood-select-trigger {
-  @apply w-full;
+.signup-link-text {
+  color: rgb(107 114 128);
 }
 
-.mood-select-content {
-  @apply w-full;
+.signup-link-button {
+  color: rgb(8 145 178);
+  font-weight: 400;
 }
 
-.mood-select-item {
-  @apply cursor-pointer;
-}
-
-.mood-option-container {
-  @apply flex items-center gap-2;
-}
-
-.mood-icon {
-  @apply w-4 h-4;
-}
-
-.mood-label {
-  @apply text-sm;
-}
-
-/* Reason textarea styles */
-.reason-textarea {
-  @apply w-full resize-none;
-}
-
-/* Suburb search and selection styles */
-.suburb-search-container {
-  @apply space-y-2;
-}
-
-.suburb-search-input {
-  @apply w-full;
-}
-
-.suburb-select-trigger {
-  @apply w-full;
-}
-
-.suburb-select-content {
-  @apply w-full;
-}
-
-.suburb-select-item {
-  @apply cursor-pointer;
-}
-
-.suburb-option-container {
-  @apply flex items-center gap-2;
-}
-
-.suburb-icon {
-  @apply w-4 h-4 text-gray-500;
-}
-
-.suburb-name {
-  @apply text-sm;
-}
-
-/* Form submit button */
-.form-submit-button {
-  @apply w-full bg-blue-600 hover:bg-blue-700 text-white mt-6;
-}
-
-/* 
-=== METRICS SIDEBAR STYLES ===
-Right sidebar with key metrics display
-*/
-.metrics-sidebar-card {
-  @apply shadow-sm border border-gray-200;
-}
-
-.metrics-card-header {
-  @apply bg-gray-50 border-b border-gray-100;
-}
-
-.metrics-card-title {
-  @apply text-lg font-semibold text-gray-900;
-}
-
-.metrics-card-content {
-  @apply p-6 space-y-6;
-}
-
-/* Individual metric item styles */
-.metric-item {
-  @apply flex items-center gap-4;
-}
-
-.metric-icon-container {
-  @apply w-10 h-10 rounded-lg flex items-center justify-center;
-}
-
-.metric-icon-container.sentiment {
-  @apply bg-green-100;
-}
-
-.metric-icon-container.residents {
-  @apply bg-blue-100;
-}
-
-.metric-icon-container.comments {
-  @apply bg-purple-100;
-}
-
-.metric-icon-container.growth {
-  @apply bg-orange-100;
-}
-
-.metric-icon {
-  @apply w-5 h-5;
-}
-
-.metric-icon-container.sentiment .metric-icon {
-  @apply text-green-600;
-}
-
-.metric-icon-container.residents .metric-icon {
-  @apply text-blue-600;
-}
-
-.metric-icon-container.comments .metric-icon {
-  @apply text-purple-600;
-}
-
-.metric-icon-container.growth .metric-icon {
-  @apply text-orange-600;
-}
-
-.metric-details {
-  @apply flex flex-col;
-}
-
-.metric-label {
-  @apply text-sm text-gray-600;
-}
-
-.metric-value {
-  @apply text-xl font-bold text-gray-900;
-}
-
-.metric-sublabel {
-  @apply text-xs text-gray-500;
-}
-
-.metric-value.growth-positive {
-  @apply text-green-600;
-}
-
-/* 
-=== RESPONSIVE DESIGN ===
-Mobile-first responsive adjustments
-*/
-@media (max-width: 1024px) {
-  .page-layout-grid {
-    @apply grid-cols-1;
-  }
-
-  .sidebar-navigation {
-    @apply hidden;
-  }
-
-  .content-grid-layout {
-    @apply grid-cols-1;
-  }
-}
-
-@media (max-width: 768px) {
-  .main-content-area {
-    @apply p-4;
-  }
-
-  .page-header-section {
-    @apply flex-col items-start gap-4;
-  }
+.signup-link-button:hover {
+  color: rgb(14 116 144);
 }
