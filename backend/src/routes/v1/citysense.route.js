@@ -86,7 +86,12 @@ router.post('/mood/form', citysenseController.submitMoodForm);
  *       200:
  *         description: Suburb mood statistics
  */
-router.get('/suburbs/stats', citysenseController.getSuburbMoodStats);
+router.get('/suburbs/stats', citysenseController.getCombinedSuburbData);
 
+// Add these new routes
+router.get('/data/weather', citysenseController.getAllWeatherData);
+router.get('/data/pollution', citysenseController.getAllPollutionData);
+router.get('/data/moods', citysenseController.getAllMoodData);
+router.get('/data/combined', citysenseController.getCombinedSuburbData);
 
 module.exports = router;

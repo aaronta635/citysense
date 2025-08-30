@@ -1,4 +1,5 @@
 "use client"
+import "./form.css";
 
 import type React from "react"
 import { useState } from "react"
