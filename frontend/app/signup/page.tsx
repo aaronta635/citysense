@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -99,7 +101,7 @@ export default function SignUpPage() {
         <div className="signup-footer-section text-center space-y-4">
           <p className="signin-link-text text-gray-600">
             Already have an account?{" "}
-            <Link href="/signin" className="signin-link text-green-500 hover:text-green-600 font-medium">
+            <Link href="/login" className="signin-link text-green-500 hover:text-green-600 font-medium">
               Sign in here
             </Link>
           </p>

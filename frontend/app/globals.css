@@ -75,11 +75,7 @@ Inter font family with various weights and styles
 Custom CSS variables for consistent theming across the feedback form
 Inspired by modern dashboard designs with blue and green accent colors
 */
-.nav-bar-txt { 
-  font-family: "Inter", sans-serif;
-  font-weight: 700;
-  color: rgb(0,0,0);
-}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -87,8 +83,8 @@ Inspired by modern dashboard designs with blue and green accent colors
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.95 0.05 140);
+  --primary-foreground: oklch(0.95 0.05 140);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -116,9 +112,9 @@ Inspired by modern dashboard designs with blue and green accent colors
   --sidebar-ring: oklch(0.708 0 0);
 
   /* Custom feedback form colors */
-  --feedback-primary: oklch(0.5 0.2 220); /* Modern blue */
+  --feedback-primary: oklch(oklch(0.95 0.05 140));
   --feedback-secondary: oklch(0.6 0.15 160); /* Soft green */
-  --feedback-accent: oklch(0.7 0.1 200); /* Light blue accent */
+  --feedback-accent: oklch(oklch(0.95 0.05 140)); 
 }
 
 .dark {
@@ -128,8 +124,8 @@ Inspired by modern dashboard designs with blue and green accent colors
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.145 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: oklch(oklch(0.95 0.05 140));
+  --primary-foreground: oklch(oklch(0.95 0.05 140));
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -222,7 +218,6 @@ Inspired by dashboard designs with proper spacing and visual hierarchy
 .page-layout-grid {
   @apply grid min-h-screen gap-4;
   grid-template-columns: 280px 1fr;
-  background-color: rgb(255, 255, 255);
 }
 
 /* 
@@ -289,9 +284,7 @@ Right side content with header and form
 
 .submit-feedback-button {
   @apply bg-green-600 hover:bg-green-700 text-white;
-  background-color: #4caf50; 
-  font-family: "Inter", sans-serif;
-  font-weight: 600;
+  font-size: 12px;
 }
 
 .button-icon {
@@ -313,26 +306,18 @@ Main form container with proper spacing
 */
 .feedback-form-card {
   @apply shadow-sm border border-gray-200;
-  background-color: rgb(255, 255, 255);
 }
 
 .form-card-header {
   @apply bg-blue-50 border-b border-blue-100;
-  background-color: rgb(255, 255, 255);
 }
 
 .form-card-title {
-  @apply text-xl font-semibold ;
-  color: rgb(21, 189, 105);
-  font-family: "Inter", sans-serif;
-  font-weight: 700;
+  @apply text-xl font-semibold text-blue-900;
 }
 
 .form-card-description {
   @apply text-blue-700;
-  color: rgb(0,0,0);
-  font-family: "Inter", sans-serif;
-  font-weight: 500;
 }
 
 .form-card-content {
@@ -353,10 +338,9 @@ Individual form elements with consistent spacing
 
 .form-field-label {
   @apply text-sm font-medium;
-  color: rgb(0,0,0);
+  color: rgb(0, 0, 0);
   font-family: "Inter", sans-serif;
   font-weight: 500;
-  font-size: 16px;
 }
 
 /* Mood selection dropdown styles */
@@ -416,7 +400,7 @@ Individual form elements with consistent spacing
 
 .suburb-icon {
   @apply w-4 h-4;
-  color: rgb(21, 189, 105);
+  color: rgb(0, 0, 0);
   font-family: "Inter", sans-serif;
   font-weight: 500;
 }
@@ -425,14 +409,15 @@ Individual form elements with consistent spacing
   @apply text-sm;
 }
 
-/* Form submit button  at the end of the form , !!!not the pop up */
+/* Form submit button */
 .form-submit-button {
-  @apply w-full bg-blue-600 hover:bg-green-700 text-white mt-6;
-  background-color: rgb(21, 189, 105);
+  @apply w-full bg-blue-600;
+  background-color: #4caf50;
   font-family: "Inter", sans-serif;
-  font-weight: 600;
-  font-size: 20px; 
-  
+  font-weight: 500;
+  font-size:  10px; /*not the pop up*/
+  border-radius: 5px;
+
 }
 
 /* 
@@ -445,14 +430,10 @@ Right sidebar with key metrics display
 
 .metrics-card-header {
   @apply bg-gray-50 border-b border-gray-100;
-  background-color: rgb(255, 255, 255);
 }
 
 .metrics-card-title {
   @apply text-lg font-semibold text-gray-900;
-  color: rgb(21, 189, 105);
-  font-family: "Inter", sans-serif;
-  font-weight: 700;
 }
 
 .metrics-card-content {
