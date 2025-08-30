@@ -116,4 +116,49 @@ router.get('/analyze', citysenseController.analyzeCity);
  */
 router.get('/analyze/all', citysenseController.analyzeAll);
 
+/**
+ * @swagger
+ * /citysense/trends:
+ *   get:
+ *     summary: Get mood trends over the past N days (default = 3)
+ *     parameters:
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *           default: 3
+ *         description: Number of days to calculate trend (e.g., 3, 7)
+ *     responses:
+ *       200:
+ *         description: Mood trend analysis
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 trends:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       suburb:
+ *                         type: string
+ *                         example: Sydney
+ *                       mood:
+ *                         type: string
+ *                         example: Happy
+ *                       today:
+ *                         type: integer
+ *                         example: 5
+ *                       avgPrev:
+ *                         type: number
+ *                         example: 3.2
+ *                       change:
+ *                         type: string
+ *                         example: "+56%"
+ */
+router.get('/trends', citysenseController.getTrends);
+
 module.exports = router;

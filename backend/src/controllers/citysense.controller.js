@@ -5,6 +5,7 @@ const Mood = require('../models/mood.model');
 const aiService = require('../services/citysenseAI.service');   
 const { summarizeAnalysis } = require('../utils/analysisSummary');
 const { generateNewsHeadline } = require('../utils/newsfeedAI.js');
+const { Op, fn, col, literal } = require('sequelize');
 
 const getWeather = catchAsync(async (req, res) => {
   const suburb = req.query.suburb || 'Sydney';
@@ -88,10 +89,8 @@ const analyzeCity = catchAsync(async (req, res) => {
     });
   }
 
-  // chạy AI Python
   const aiResult = await aiService.runPythonAI(weather, pollution, formattedMoods);
 
-  // làm sạch + generate headline
   const enhancedNewsfeed = [];
   for (const line of aiResult.newsfeed) {
     const sentiment = line.includes("[NEGATIVE]") ? "NEGATIVE" : "POSITIVE";
@@ -144,7 +143,6 @@ const analyzeAll = catchAsync(async (req, res) => {
     } else {
       const aiResult = await aiService.runPythonAI(weather, pollution, formattedMoods);
 
-      // làm sạch + generate headline
       const enhancedNewsfeed = [];
       for (const line of aiResult.newsfeed) {
         const sentiment = line.includes("[NEGATIVE]") ? "NEGATIVE" : "POSITIVE";
@@ -167,11 +165,76 @@ const analyzeAll = catchAsync(async (req, res) => {
   });
 });
 
+const getTrends = catchAsync(async (req, res) => {
+  const days = parseInt(req.query.days || "3"); 
+  const today = new Date();
+  const startDate = new Date();
+  startDate.setDate(today.getDate() - (days - 1));
+
+  const moods = await Mood.findAll({
+    where: {
+      createdAt: { [Op.gte]: startDate },
+    },
+    raw: true,
+  });
+
+  const grouped = {};
+  for (const m of moods) {
+    const suburb = m.suburb;
+    const mood = m.user_mood;
+    const dateKey = new Date(m.createdAt).toLocaleDateString("en-CA"); // YYYY-MM-DD local
+
+    if (!grouped[suburb]) grouped[suburb] = {};
+    if (!grouped[suburb][mood]) grouped[suburb][mood] = {};
+    if (!grouped[suburb][mood][dateKey]) grouped[suburb][mood][dateKey] = 0;
+
+    grouped[suburb][mood][dateKey] += 1;
+  }
+
+  const trends = {};
+  const todayKey = today.toLocaleDateString("en-CA");
+
+  for (const suburb of Object.keys(grouped)) {
+    trends[suburb] = {};
+    for (const mood of Object.keys(grouped[suburb])) {
+      const counts = grouped[suburb][mood];
+      const todayCount = counts[todayKey] || 0;
+
+      let prevSum = 0;
+      let prevCount = 0;
+      for (let i = 1; i < days; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const key = d.toLocaleDateString("en-CA");
+        prevSum += counts[key] || 0;
+        prevCount++;
+      }
+      const avgPrev = prevCount > 0 ? prevSum / prevCount : 0;
+
+      let change = "0%";
+      if (avgPrev > 0) {
+        change = (((todayCount - avgPrev) / avgPrev) * 100).toFixed(1) + "%";
+      } else if (todayCount > 0) {
+        change = "+∞";
+      }
+
+      trends[suburb][mood] = {
+        today: todayCount,
+        avgPrev: Number(avgPrev.toFixed(1)),
+        change,
+      };
+    }
+  }
+
+  res.json({ success: true, trends });
+});
+
 module.exports = {
   getWeather,
   getPollution,
   submitMoodForm,
   getSuburbMoodStats,
   analyzeCity,
-  analyzeAll
+  analyzeAll,
+  getTrends
 };
