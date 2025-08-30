@@ -6,16 +6,14 @@ import styles from "./page.module.css";
 import { GOOGLE_MAPS_API_KEY } from "./config";
 import { Users, Heart, MessageSquare, TrendingUp } from "lucide-react";
 
-// Sydney map configuration
 const SYDNEY_CENTER = { lat: -33.8688, lng: 151.2093 };
 const SYDNEY_BOUNDS = {
-  north: -33.7, // Northern boundary (Hornsby area)
-  south: -34.0, // Southern boundary (Sutherland area)
-  east: 151.3, // Eastern boundary (Bondi area)
-  west: 150.9, // Western boundary (Parramatta area)
+  north: -33.7,
+  south: -34.0,
+  east: 151.3,
+  west: 150.9,
 };
 
-// Community sentiment data for each Sydney suburb
 const suburbSentimentData = [
   {
     name: "Sydney CBD",
@@ -439,7 +437,6 @@ const suburbSentimentData = [
   },
 ];
 
-// Type definitions
 interface MoodBreakdown {
   happy: number;
   neutral: number;
@@ -473,34 +470,28 @@ export default function SydneySensePage() {
 
   const mapRef = useRef<HTMLDivElement>(null);
 
-  // Toggle dropdown menu
   const toggleDropdown = () => {
     console.log("Dropdown clicked, current state:", isDropdownOpen);
     setIsDropdownOpen(!isDropdownOpen);
     console.log("New state will be:", !isDropdownOpen);
   };
 
-  // Enhanced suburb search with debouncing
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
 
-  // Enhanced click outside handler for all dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
 
-      // Check for activity dropdown
       if (!target.closest(".activity-dropdown")) {
         setIsDropdownOpen(false);
       }
 
-      // Enhanced search suggestions handling
       if (!target.closest(`[class*="searchInputContainer"]`)) {
         setShowSuggestions(false);
       }
 
-      // Check for profile dropdown
       if (!target.closest(".profile-dropdown")) {
         setIsProfileOpen(false);
       }
@@ -515,17 +506,14 @@ export default function SydneySensePage() {
     };
   }, [isDropdownOpen, showSuggestions, isProfileOpen]);
 
-  // Convert sentiment score to mood-based color
   const getSentimentColor = (
     sentimentScore: number,
     moodBreakdown?: MoodBreakdown
   ): string => {
-    // If moodBreakdown is provided, use the largest mood percentage
     if (moodBreakdown) {
       const { happy, neutral, angry, sad, stressed } = moodBreakdown;
       const maxMood = Math.max(happy, neutral, angry, sad, stressed);
 
-      // Debug logging to check mood percentages
       console.log(`Mood breakdown for suburb:`, {
         happy,
         neutral,
@@ -545,20 +533,18 @@ export default function SydneySensePage() {
             : "stressed",
       });
 
-      if (maxMood === happy) return "#4caf50"; // Green for happy
-      if (maxMood === neutral) return "#ffeb3b"; // Yellow for neutral
-      if (maxMood === angry) return "#f44336"; // Red for angry
-      if (maxMood === sad) return "#9c27b0"; // Purple for sad
-      return "#9e9e9e"; // Gray for stressed
+      if (maxMood === happy) return "#4caf50";
+      if (maxMood === neutral) return "#ffeb3b";
+      if (maxMood === angry) return "#f44336";
+      if (maxMood === sad) return "#9c27b0";
+      return "#9e9e9e";
     }
 
-    // Fallback to original sentiment score logic
-    if (sentimentScore >= 0.66) return "#4caf50"; // Green for happy (66%+)
-    if (sentimentScore >= 0.33) return "#ffeb3b"; // Yellow for neutral (33-65%)
-    return "#f44336"; // Red for angry (0-32%)
+    if (sentimentScore >= 0.66) return "#4caf50";
+    if (sentimentScore >= 0.33) return "#ffeb3b";
+    return "#f44336";
   };
 
-  // Initialize the Sydney map
   const initializeSydneyMap = () => {
     try {
       console.log("Setting up Sydney map...");
@@ -569,22 +555,21 @@ export default function SydneySensePage() {
         return;
       }
 
-      // Create the main map centered on Sydney
       const newMap = new google.maps.Map(mapRef.current, {
         zoom: 14,
         center: SYDNEY_CENTER,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
-        minZoom: 11, // Don't zoom out too far
-        maxZoom: 18, // Don't zoom in too close
+        minZoom: 11,
+        maxZoom: 18,
         restriction: {
           latLngBounds: SYDNEY_BOUNDS,
-          strictBounds: true, // Keep users within Sydney area
+          strictBounds: true,
         },
         styles: [
           {
-            featureType: "poi", // Points of interest
+            featureType: "poi",
             elementType: "labels",
-            stylers: [{ visibility: "off" }], // Hide POI labels for cleaner look
+            stylers: [{ visibility: "off" }],
           },
         ],
       });
@@ -592,14 +577,11 @@ export default function SydneySensePage() {
       setMap(newMap);
       console.log("Sydney map created successfully");
 
-      // Add a subtle boundary indicator around Sydney region
       addSydneyBoundaryIndicator(newMap);
 
-      // Create sentiment circles for each suburb
       const circles = createSuburbSentimentCircles(newMap);
       setSuburbCircles(circles);
 
-      // Ensure circles are properly initialized and interactive
       setTimeout(() => {
         if (circles.length > 0) {
           console.log(
@@ -608,8 +590,6 @@ export default function SydneySensePage() {
         }
       }, 100);
 
-      // Initialize with all suburbs visible and update stats
-      // Calculate actual stats from the data
       const totalSuburbs = suburbSentimentData.length;
       const totalSentiment = suburbSentimentData.reduce(
         (sum, suburb) => sum + suburb.sentiment,
@@ -617,10 +597,8 @@ export default function SydneySensePage() {
       );
       const averageSentiment = totalSentiment / totalSuburbs;
 
-      // Pass the correct values: visibleCount, totalSentiment, visibleSuburbs
       updateFilterStats(totalSuburbs, totalSentiment, totalSuburbs);
 
-      // Add map controls for user interaction
       addMapControls(newMap);
 
       setIsMapLoading(false);
@@ -631,12 +609,11 @@ export default function SydneySensePage() {
     }
   };
 
-  // Add a visual boundary around the Sydney region
   const addSydneyBoundaryIndicator = (mapInstance: google.maps.Map) => {
     new google.maps.Rectangle({
       bounds: SYDNEY_BOUNDS,
       fillColor: "#4caf50",
-      fillOpacity: 0.05, // Very subtle fill
+      fillOpacity: 0.05,
       strokeColor: "#2d5a2d",
       strokeOpacity: 0.8,
       strokeWeight: 2,
@@ -644,21 +621,18 @@ export default function SydneySensePage() {
     });
   };
 
-  // Create sentiment circles for each suburb
   const createSuburbSentimentCircles = (
     mapInstance: google.maps.Map
   ): google.maps.Circle[] => {
     const circles: google.maps.Circle[] = [];
 
     suburbSentimentData.forEach((suburb) => {
-      // Get the color based on mood breakdown
       const circleColor = getSentimentColor(
         suburb.sentiment,
         suburb.moodBreakdown
       );
 
-      // Calculate dynamic transparency based on sentiment intensity and submission count
-      const baseOpacity = 0.2; // Minimum transparency
+      const baseOpacity = 0.2;
       const sentimentIntensity =
         Math.max(
           suburb.moodBreakdown.happy,
@@ -666,41 +640,33 @@ export default function SydneySensePage() {
           suburb.moodBreakdown.angry,
           suburb.moodBreakdown.sad,
           suburb.moodBreakdown.stressed
-        ) / 100; // Normalize to 0-1
+        ) / 100;
 
-      // Higher sentiment intensity = more opaque, more submissions = more visible
       const submissionFactor = Math.min(
         suburb.moodBreakdown.totalSubmissions / 200,
         1
-      ); // Normalize to 200 max submissions
+      );
       const dynamicOpacity =
         baseOpacity + sentimentIntensity * 0.4 + submissionFactor * 0.2;
 
-      // Clamp opacity between 0.2 and 0.8
       const finalOpacity = Math.max(0.2, Math.min(0.8, dynamicOpacity));
 
-      // Create a circle representing the suburb area
       const suburbCircle = new google.maps.Circle({
         center: suburb.center,
         radius: suburb.radius,
         fillColor: circleColor,
-        fillOpacity: finalOpacity, // Dynamic transparency
+        fillOpacity: finalOpacity,
         strokeColor: circleColor,
         strokeOpacity: 0.8,
         strokeWeight: 2,
         map: mapInstance,
       });
 
-      // Store original opacity and stroke color for hover effects
       (suburbCircle as any).originalOpacity = finalOpacity;
       (suburbCircle as any).originalStrokeColor = circleColor;
 
-      // No info popup needed - removed dropdown functionality
-
-      // Make the suburb circle interactive
       makeSuburbCircleInteractive(suburbCircle, mapInstance, suburb);
 
-      // Store the circle for later use (showing/hiding)
       circles.push(suburbCircle);
     });
 
@@ -708,25 +674,18 @@ export default function SydneySensePage() {
     return circles;
   };
 
-  // Make a suburb circle interactive with click and hover effects
   const makeSuburbCircleInteractive = (
     circle: google.maps.Circle,
     mapInstance: google.maps.Map,
     suburb: SuburbData
-  ) => {
-    // No hover effects - heat spots are static visual indicators
-    // No click functionality - heat spots are visual only
-  };
+  ) => {};
 
-  // Add map control buttons
   const addMapControls = (mapInstance: google.maps.Map) => {
-    // Add reset button to return to default view
     mapInstance.controls[google.maps.ControlPosition.TOP_RIGHT].push(
       createResetButton(mapInstance)
     );
   };
 
-  // Create the reset button to return to default view
   const createResetButton = (mapInstance: google.maps.Map) => {
     const resetButton = document.createElement("div");
     resetButton.style.backgroundColor = "#fff";
@@ -754,14 +713,12 @@ export default function SydneySensePage() {
     return resetButton;
   };
 
-  // Update the statistics display
   const updateFilterStats = (
     visibleCount: number,
     totalSentiment: number,
     visibleSuburbs: number
   ) => {
     if (visibleSuburbs > 0) {
-      // totalSentiment is the sum of sentiment scores (0-1), so convert to percentage
       const averageSentiment = Math.round(
         (totalSentiment / visibleSuburbs) * 100
       );
@@ -774,7 +731,6 @@ export default function SydneySensePage() {
     }
   };
 
-  // Calculate initial stats from all suburbs data
   const calculateInitialStats = () => {
     const totalSuburbs = suburbSentimentData.length;
     const totalSentiment = suburbSentimentData.reduce(
@@ -786,7 +742,6 @@ export default function SydneySensePage() {
     return { totalSuburbs, totalSentiment, averageSentiment };
   };
 
-  // Filter suburbs based on selected mood
   const filterBySentiment = () => {
     const selectedFilter = (
       document.getElementById("sentimentFilter") as HTMLSelectElement
@@ -799,7 +754,6 @@ export default function SydneySensePage() {
       const suburb = suburbSentimentData[index];
       let shouldShow = false;
 
-      // Use moodBreakdown data instead of sentiment score for more accurate filtering
       if (suburb.moodBreakdown) {
         const { happy, neutral, angry, sad, stressed } = suburb.moodBreakdown;
 
@@ -809,50 +763,49 @@ export default function SydneySensePage() {
               happy >= neutral &&
               happy >= angry &&
               happy >= sad &&
-              happy >= stressed; // Happy is the highest percentage
+              happy >= stressed;
             break;
           case "neutral":
             shouldShow =
               neutral >= happy &&
               neutral >= angry &&
               neutral >= sad &&
-              neutral >= stressed; // Neutral is the highest percentage
+              neutral >= stressed;
             break;
           case "angry":
             shouldShow =
               angry >= happy &&
               angry >= neutral &&
               angry >= sad &&
-              angry >= stressed; // Angry is the highest percentage
+              angry >= stressed;
             break;
           case "sad":
             shouldShow =
-              sad >= happy && sad >= neutral && sad >= angry && sad >= stressed; // Sad is the highest percentage
+              sad >= happy && sad >= neutral && sad >= angry && sad >= stressed;
             break;
           case "stressed":
             shouldShow =
               stressed >= happy &&
               stressed >= neutral &&
               stressed >= angry &&
-              stressed >= sad; // Stressed is the highest percentage
+              stressed >= sad;
             break;
-          default: // "all"
+          default:
             shouldShow = true;
             break;
         }
       } else {
-        // Fallback to sentiment score if no moodBreakdown available
         switch (selectedFilter) {
           case "happy":
-            shouldShow = suburb.sentiment >= 0.66; // Happy mood (66%+)
+            shouldShow = suburb.sentiment >= 0.66;
             break;
           case "neutral":
-            shouldShow = suburb.sentiment >= 0.33 && suburb.sentiment < 0.66; // Neutral mood (33-65%)
+            shouldShow = suburb.sentiment >= 0.33 && suburb.sentiment < 0.66;
             break;
           case "angry":
-            shouldShow = suburb.sentiment < 0.33; // Angry mood (0-32%)
+            shouldShow = suburb.sentiment < 0.33;
             break;
-          default: // "all"
+          default:
             shouldShow = true;
             break;
         }
@@ -868,11 +821,9 @@ export default function SydneySensePage() {
       }
     });
 
-    // Update the stats display
     updateFilterStats(visibleCount, totalSentiment, visibleSuburbs);
   };
 
-  // Filter suburbs by specific suburb name
   const filterBySuburb = (selectedSuburb: string) => {
     console.log("=== FILTER BY SUBURB DEBUG ===");
     console.log("Filtering by suburb:", selectedSuburb);
@@ -885,7 +836,6 @@ export default function SydneySensePage() {
     let visibleSuburbs = 0;
     let selectedSuburbData: SuburbData | null = null;
 
-    // Check if map and circles are available
     if (!map || suburbCircles.length === 0) {
       console.error("Map or suburb circles not available for filtering");
       return;
@@ -920,18 +870,16 @@ export default function SydneySensePage() {
       }
     });
 
-    // If a specific suburb is selected, center the map on it and show mood breakdown
     if (selectedSuburb !== "all" && selectedSuburbData && map) {
       const suburb = selectedSuburbData as SuburbData;
-      console.log("Selected suburb data:", suburb); // Debug log
-      console.log("Calling showMoodBreakdown for:", suburb.name); // Debug log
+      console.log("Selected suburb data:", suburb);
+      console.log("Calling showMoodBreakdown for:", suburb.name);
 
       map.setCenter(suburb.center);
-      map.setZoom(16); // Zoom in closer to see the suburb better
+      map.setZoom(16);
       showMoodBreakdown(suburb);
     } else if (selectedSuburb === "all" && map) {
-      // Return to default Sydney view
-      console.log("Returning to all suburbs view"); // Debug log
+      console.log("Returning to all suburbs view");
       map.setCenter(SYDNEY_CENTER);
       map.setZoom(14);
       hideMoodBreakdown();
@@ -943,25 +891,20 @@ export default function SydneySensePage() {
       console.log("=== END DEBUG ===");
     }
 
-    // Update the stats display
     updateFilterStats(visibleCount, totalSentiment, visibleSuburbs);
   };
 
-  // Enhanced suburb search with debouncing
   const handleSuburbSearch = (searchTerm: string) => {
     setSuburbSearchTerm(searchTerm);
 
-    // Clear previous timeout
     if (searchTimeout) {
       clearTimeout(searchTimeout);
     }
 
-    // Debounce search for better performance
     const newTimeout = setTimeout(() => {
       if (searchTerm.trim() === "") {
         setFilteredSuburbs(suburbSentimentData);
         setShowSuggestions(false);
-        // Show all suburbs when search is cleared
         filterBySuburb("all");
       } else {
         const filtered = suburbSentimentData.filter((suburb) =>
@@ -970,12 +913,11 @@ export default function SydneySensePage() {
         setFilteredSuburbs(filtered);
         setShowSuggestions(true);
       }
-    }, 300); // 300ms debounce
+    }, 300);
 
     setSearchTimeout(newTimeout);
   };
 
-  // Enhanced suburb selection with better UX
   const selectSuburb = (suburbName: string) => {
     console.log("=== SELECT SUBURB DEBUG ===");
     console.log("Selecting suburb:", suburbName);
@@ -986,18 +928,13 @@ export default function SydneySensePage() {
     console.log("Current map state:", map ? "Available" : "Not available");
     console.log("Current suburbCircles length:", suburbCircles.length);
 
-    // Filter the map to show only the selected suburb
     console.log("Calling filterBySuburb with:", suburbName);
     filterBySuburb(suburbName);
 
-    // Update the search term to show what was selected
     setSuburbSearchTerm(suburbName);
 
-    // Keep the filtered suburbs for the search suggestions
-    // Don't reset to all suburbs here
     setShowSuggestions(false);
 
-    // Focus back to search input for better UX
     const searchInput = document.querySelector(
       `[class*="${styles.suburbSearchInput}"]`
     ) as HTMLInputElement;
@@ -1008,7 +945,6 @@ export default function SydneySensePage() {
     console.log("=== END SELECT SUBURB DEBUG ===");
   };
 
-  // Show mood breakdown for a specific suburb
   const showMoodBreakdown = (suburbData: SuburbData) => {
     const moodBreakdownElement = document.getElementById("moodBreakdown");
     if (!moodBreakdownElement) {
@@ -1017,7 +953,6 @@ export default function SydneySensePage() {
 
     const breakdown = suburbData.moodBreakdown;
 
-    // Update the mood bars
     const happyBar = document.getElementById("happyBar");
     const neutralBar = document.getElementById("neutralBar");
     const angryBar = document.getElementById("angryBar");
@@ -1030,7 +965,6 @@ export default function SydneySensePage() {
     if (sadBar) sadBar.style.width = breakdown.sad + "%";
     if (stressedBar) stressedBar.style.width = breakdown.stressed + "%";
 
-    // Update the percentages
     const happyPercentage = document.getElementById("happyPercentage");
     const neutralPercentage = document.getElementById("neutralPercentage");
     const angryPercentage = document.getElementById("angryPercentage");
@@ -1045,27 +979,22 @@ export default function SydneySensePage() {
     if (stressedPercentage)
       stressedPercentage.textContent = breakdown.stressed + "%";
 
-    // Update total submissions
     const totalSubmissions = document.getElementById("totalSubmissions");
     if (totalSubmissions)
       totalSubmissions.textContent = breakdown.totalSubmissions.toString();
 
-    // Show the mood breakdown section
     moodBreakdownElement.style.display = "block";
-    // Use setTimeout to ensure display: block is applied before opacity change
     setTimeout(() => {
       moodBreakdownElement.style.opacity = "1";
     }, 10);
   };
 
-  // Hide mood breakdown when showing all suburbs
   const hideMoodBreakdown = () => {
-    console.log("hideMoodBreakdown called"); // Debug log
+    console.log("hideMoodBreakdown called");
 
     const moodBreakdown = document.getElementById("moodBreakdown");
     if (moodBreakdown) {
       moodBreakdown.style.opacity = "0";
-      // Hide after opacity transition
       setTimeout(() => {
         moodBreakdown.style.display = "none";
       }, 300);
@@ -1074,7 +1003,6 @@ export default function SydneySensePage() {
     }
   };
 
-  // Toggle visibility of all suburb circles
   const toggleSuburbOverlays = () => {
     const toggleText = document.getElementById("toggle-text");
     if (!toggleText) return;
@@ -1082,13 +1010,11 @@ export default function SydneySensePage() {
     const isVisible = suburbCircles[0] && suburbCircles[0].getMap() !== null;
 
     if (isVisible) {
-      // Hide all suburb circles
       suburbCircles.forEach((circle) => {
         circle.setMap(null);
       });
       toggleText.textContent = "Show Suburb Overlays";
     } else {
-      // Show all suburb circles
       suburbCircles.forEach((circle) => {
         circle.setMap(map);
       });
@@ -1096,11 +1022,9 @@ export default function SydneySensePage() {
     }
   };
 
-  // Handle Google Maps script load
   const handleScriptLoad = () => {
     console.log("Google Maps script loaded successfully");
 
-    // Wait for Google Maps to be fully available
     const checkGoogleMaps = () => {
       if (typeof google !== "undefined" && google.maps && google.maps.Map) {
         console.log("Google Maps is fully loaded and ready");
@@ -1114,7 +1038,6 @@ export default function SydneySensePage() {
     checkGoogleMaps();
   };
 
-  // Initialize map when everything is ready
   const initializeMapWhenReady = () => {
     console.log("Attempting to initialize map...");
     console.log("Map ref available:", !!mapRef.current);
@@ -1138,14 +1061,12 @@ export default function SydneySensePage() {
     }
   };
 
-  // Handle Google Maps script error
   const handleScriptError = () => {
     console.error("Failed to load Google Maps script");
     setMapError("Failed to load Google Maps");
     setIsMapLoading(false);
   };
 
-  // Add a timeout fallback in case the script never loads
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (isMapLoading && !map && !mapError) {
@@ -1153,14 +1074,12 @@ export default function SydneySensePage() {
         setMapError("Google Maps load timeout - please refresh the page");
         setIsMapLoading(false);
       }
-    }, 10000); // 10 second timeout
+    }, 10000);
 
     return () => clearTimeout(timeout);
   }, [isMapLoading, map, mapError]);
 
-  // Manual script loading fallback
   useEffect(() => {
-    // If Next.js Script doesn't work, try manual loading after 5 seconds
     const fallbackTimeout = setTimeout(() => {
       if (isMapLoading && !map && !mapError && typeof google === "undefined") {
         console.log("Trying manual Google Maps script loading...");
@@ -1182,7 +1101,6 @@ export default function SydneySensePage() {
     return () => clearTimeout(fallbackTimeout);
   }, [isMapLoading, map, mapError]);
 
-  // Single consolidated initialization check
   useEffect(() => {
     if (
       mapRef.current &&
@@ -1197,7 +1115,6 @@ export default function SydneySensePage() {
     }
   }, [mapRef.current, map, mapError, isMapLoading]);
 
-  // Single initialization check when component mounts
   useEffect(() => {
     const checkAndInitialize = () => {
       if (
@@ -1210,15 +1127,13 @@ export default function SydneySensePage() {
       ) {
         console.log("Component mounted, initializing map...");
         initializeSydneyMap();
-        return true; // Successfully initialized
+        return true;
       }
-      return false; // Not ready yet
+      return false;
     };
 
-    // Check immediately
     if (checkAndInitialize()) return;
 
-    // If not ready, check once more after a reasonable delay
     const timeout = setTimeout(() => {
       checkAndInitialize();
     }, 1000);
@@ -1226,14 +1141,11 @@ export default function SydneySensePage() {
     return () => clearTimeout(timeout);
   }, [isMapLoading, map, mapError]);
 
-  // Helper functions for ranking chart
   const getTop3SuburbsByMood = (): SuburbData[] => {
-    // Sort suburbs by their happy mood percentage
     const sortedSuburbs = [...suburbSentimentData].sort((a, b) => {
-      return b.moodBreakdown.happy - a.moodBreakdown.happy; // Descending order by happy percentage
+      return b.moodBreakdown.happy - a.moodBreakdown.happy;
     });
 
-    // Debug: Log the top 3 suburbs and their happy percentages
     console.log(
       "Top 3 suburbs by happy mood:",
       sortedSuburbs.slice(0, 3).map((suburb) => ({
@@ -1271,7 +1183,6 @@ export default function SydneySensePage() {
     return "😰";
   };
 
-  // Helper function for pie chart rotation
   const getPieChartRotation = (moodType: string) => {
     const totalSubmissions = suburbSentimentData.reduce(
       (sum, suburb) => sum + suburb.moodBreakdown.totalSubmissions,
@@ -1301,10 +1212,9 @@ export default function SydneySensePage() {
     });
 
     const percentage = (totalMoodValue / totalSubmissions) * 100;
-    return percentage * 3.6; // 360 degrees for 100%
+    return percentage * 3.6;
   };
 
-  // Helper function for overall mood percentage
   const getOverallMoodPercentage = (moodType: string) => {
     const totalSubmissions = suburbSentimentData.reduce(
       (sum, suburb) => sum + suburb.moodBreakdown.totalSubmissions,
@@ -1314,7 +1224,6 @@ export default function SydneySensePage() {
 
     let totalMoodValue = 0;
     suburbSentimentData.forEach((suburb) => {
-      // Convert percentage to actual count based on total submissions for that suburb
       switch (moodType) {
         case "happy":
           totalMoodValue +=
@@ -1349,9 +1258,7 @@ export default function SydneySensePage() {
       : 0;
   };
 
-  // Helper function to create pie chart conic gradient
   const getPieChartGradient = () => {
-    // Calculate total submissions across all suburbs
     const totalSubmissions = suburbSentimentData.reduce(
       (sum, suburb) => sum + suburb.moodBreakdown.totalSubmissions,
       0
@@ -1359,7 +1266,6 @@ export default function SydneySensePage() {
 
     if (totalSubmissions === 0) return "";
 
-    // Calculate total mood values across all suburbs
     let totalHappy = 0;
     let totalNeutral = 0;
     let totalAngry = 0;
@@ -1384,7 +1290,6 @@ export default function SydneySensePage() {
         suburb.moodBreakdown.totalSubmissions;
     });
 
-    // Convert to percentages of total submissions
     const happyPercent = (totalHappy / totalSubmissions) * 100;
     const neutralPercent = (totalNeutral / totalSubmissions) * 100;
     const angryPercent = (totalAngry / totalSubmissions) * 100;
@@ -1431,7 +1336,6 @@ export default function SydneySensePage() {
     return segments.join(", ");
   };
 
-  // Validate mood percentages add up to 100%
   const validateMoodPercentages = () => {
     suburbSentimentData.forEach((suburb, index) => {
       const { happy, neutral, angry, sad, stressed } = suburb.moodBreakdown;
@@ -1453,12 +1357,10 @@ export default function SydneySensePage() {
     });
   };
 
-  // Run validation on component mount
   useEffect(() => {
     validateMoodPercentages();
   }, []);
 
-  // Keyboard navigation for search suggestions
   const handleSearchKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement>
   ) => {
@@ -1469,7 +1371,6 @@ export default function SydneySensePage() {
     }
   };
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (searchTimeout) {
@@ -1661,9 +1562,7 @@ export default function SydneySensePage() {
 
           <h3 style={{ marginTop: "15px" }}>Suburb Filter</h3>
 
-          {/* Combined Search and Dropdown */}
           <div className={styles.combinedFilterContainer}>
-            {/* Search Input with Suggestions */}
             <div className={styles.searchInputContainer}>
               <input
                 type="text"
@@ -1690,7 +1589,6 @@ export default function SydneySensePage() {
                     setFilteredSuburbs(suburbSentimentData);
                     setShowSuggestions(false);
                     filterBySuburb("all");
-                    // Reset search input focus
                     const searchInput = document.querySelector(
                       `[class*="${styles.suburbSearchInput}"]`
                     ) as HTMLInputElement;
@@ -1721,7 +1619,6 @@ export default function SydneySensePage() {
                           className={styles.suggestionItem}
                           onClick={() => {
                             selectSuburb(suburb.name);
-                            // Small delay to ensure click event processes before hiding
                             setTimeout(() => {
                               setShowSuggestions(false);
                             }, 100);
@@ -1752,10 +1649,9 @@ export default function SydneySensePage() {
               )}
             </div>
 
-            {/* Show All Button */}
             <button
               onClick={() => {
-                console.log("Show All clicked"); // Debug log
+                console.log("Show All clicked");
                 filterBySuburb("all");
                 setSuburbSearchTerm("");
                 setFilteredSuburbs(suburbSentimentData);
@@ -1883,13 +1779,11 @@ export default function SydneySensePage() {
               console.log("Manual map init triggered");
               if (typeof google !== "undefined" && google.maps) {
                 initializeSydneyMap();
-                // Reset mood filter dropdown to "All Moods"
                 const sentimentFilter = document.getElementById(
                   "sentimentFilter"
                 ) as HTMLSelectElement;
                 if (sentimentFilter) {
                   sentimentFilter.value = "all";
-                  // Trigger the filter to show all suburbs
                   filterBySentiment();
                 }
               } else {
