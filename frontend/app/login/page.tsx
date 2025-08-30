@@ -1,4 +1,5 @@
 "use client"
+import "./login.css";
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"

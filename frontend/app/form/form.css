@@ -1,0 +1,426 @@
+/* 
+=== FEEDBACK FORM CUSTOM STYLES ===
+Modern, clean styling for the feedback form with readable class names
+Inspired by dashboard designs with proper spacing and visual hierarchy
+*/
+
+/* Main page container - full height layout */
+.feedback-page-container {
+  min-height: 100vh;
+  background-color: rgb(249 250 251);
+}
+
+/* Grid layout for sidebar and main content */
+.page-layout-grid {
+  display: grid;
+  min-height: 100vh;
+  gap: 1rem;
+  grid-template-columns: 280px 1fr;
+}
+
+/* 
+=== SIDEBAR NAVIGATION STYLES ===
+Left sidebar with navigation menu items
+*/
+.sidebar-navigation {
+  background-color: white;
+  border-right: 1px solid rgb(229 231 235);
+  padding: 1.5rem;
+}
+
+.sidebar-header {
+  margin-bottom: 2rem;
+}
+
+.sidebar-brand-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgb(21, 189, 105);
+  font-family: "Inter", sans-serif;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  color: rgb(75 85 99);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sidebar-menu-item:hover {
+  background-color: rgb(243 244 246);
+}
+
+.sidebar-menu-item.current {
+  background-color: rgb(239 246 255);
+  color: rgb(37 99 235);
+  border: 1px solid rgb(191 219 254);
+}
+
+.sidebar-menu-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* 
+=== MAIN CONTENT AREA STYLES ===
+Right side content with header and form
+*/
+.main-content-area {
+  padding: 2rem;
+  overflow: auto;
+}
+
+.page-header-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.page-title-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.page-main-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: rgb(21, 189, 105);
+  font-family: "Inter", sans-serif;
+}
+
+.page-subtitle {
+  color: rgb(75 85 99);
+}
+
+.submit-feedback-button {
+  background-color: rgb(22 163 74);
+  color: white;
+  font-size: 12px;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-feedback-button:hover {
+  background-color: rgb(21 128 61);
+}
+
+.button-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+}
+
+/* 
+=== CONTENT GRID LAYOUT ===
+Two-column layout for form and metrics
+*/
+.content-grid-layout {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 2fr 1fr;
+}
+
+/* 
+=== FEEDBACK FORM CARD STYLES ===
+Main form container with proper spacing
+*/
+.feedback-form-card {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border: 1px solid rgb(229 231 235);
+  border-radius: 0.5rem;
+}
+
+.form-card-header {
+  background-color: rgb(239 246 255);
+  border-bottom: 1px solid rgb(219 234 254);
+  padding: 1.5rem;
+}
+
+.form-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgb(30 58 138);
+}
+
+.form-card-description {
+  color: rgb(29 78 216);
+}
+
+.form-card-content {
+  padding: 1.5rem;
+}
+
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 
+=== FORM FIELD STYLES ===
+Individual form elements with consistent spacing
+*/
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(0, 0, 0);
+  font-family: "Inter", sans-serif;
+}
+
+/* Mood selection dropdown styles */
+.mood-select-trigger {
+  width: 100%;
+}
+
+.mood-select-content {
+  width: 100%;
+}
+
+.mood-select-item {
+  cursor: pointer;
+}
+
+.mood-option-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mood-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.mood-label {
+  font-size: 0.875rem;
+}
+
+/* Reason textarea styles */
+.reason-textarea {
+  width: 100%;
+  resize: none;
+  border: 1px solid rgb(209 213 219);
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  font-family: inherit;
+}
+
+.reason-textarea:focus {
+  outline: none;
+  border-color: rgb(34 197 94);
+  box-shadow: 0 0 0 3px rgb(34 197 94 / 0.1);
+}
+
+/* Suburb search and selection styles */
+.suburb-search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.suburb-search-input {
+  width: 100%;
+  border: 1px solid rgb(209 213 219);
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  font-family: inherit;
+}
+
+.suburb-search-input:focus {
+  outline: none;
+  border-color: rgb(34 197 94);
+  box-shadow: 0 0 0 3px rgb(34 197 94 / 0.1);
+}
+
+.suburb-select-trigger {
+  width: 100%;
+}
+
+.suburb-select-content {
+  width: 100%;
+}
+
+.suburb-select-item {
+  cursor: pointer;
+}
+
+.suburb-option-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.suburb-icon {
+  width: 1rem;
+  height: 1rem;
+  color: rgb(0, 0, 0);
+  font-family: "Inter", sans-serif;
+}
+
+.suburb-name {
+  font-size: 0.875rem;
+}
+
+/* Form submit button */
+.form-submit-button {
+  width: 100%;
+  background-color: #4caf50;
+  color: white;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  border-radius: 5px;
+  padding: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.form-submit-button:hover {
+  background-color: #45a049;
+}
+
+/* 
+=== METRICS SIDEBAR STYLES ===
+Right sidebar with key metrics display
+*/
+.metrics-sidebar-card {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border: 1px solid rgb(229 231 235);
+  border-radius: 0.5rem;
+}
+
+.metrics-card-header {
+  background-color: rgb(249 250 251);
+  border-bottom: 1px solid rgb(243 244 246);
+  padding: 1.5rem;
+}
+
+.metrics-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: rgb(17 24 39);
+}
+
+.metrics-card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Individual metric item styles */
+.metric-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.metric-icon-container {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+}
+
+.metric-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: rgb(34 197 94);
+  stroke-width: 2;
+  fill: none;
+}
+
+.metric-icon-container.sentiment .metric-icon {
+  color: rgb(34 197 94);
+}
+
+.metric-icon-container.residents .metric-icon {
+  color: rgb(34 197 94);
+}
+
+.metric-icon-container.comments .metric-icon {
+  color: rgb(34 197 94);
+}
+
+.metric-icon-container.growth .metric-icon {
+  color: rgb(34 197 94);
+}
+
+.metric-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  color: rgb(75 85 99);
+}
+
+.metric-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: rgb(17 24 39);
+}
+
+.metric-sublabel {
+  font-size: 0.75rem;
+  color: rgb(107 114 128);
+}
+
+.metric-value.growth-positive {
+  color: rgb(22 163 74);
+}
+
+/* 
+=== RESPONSIVE DESIGN ===
+Mobile-first responsive adjustments
+*/
+@media (max-width: 1024px) {
+  .page-layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-navigation {
+    display: none;
+  }
+
+  .content-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content-area {
+    padding: 1rem;
+  }
+
+  .page-header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}

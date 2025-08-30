@@ -1,0 +1,118 @@
+/* 
+=== SIGNUP PAGE CUSTOM STYLES ===
+Modern, clean styling for the signup form with consistent theming
+*/
+
+/* Main page container */
+.signup-page-container {
+  @apply min-h-screen bg-gray-50 flex items-center justify-center p-4;
+}
+
+.signup-form-wrapper {
+  @apply w-full max-w-md space-y-8;
+}
+
+/* Header Section */
+.signup-header-section {
+  @apply text-center space-y-4;
+}
+
+.signup-icon-container {
+  @apply mx-auto w-16 h-16 bg-green-500 rounded-full flex items-center justify-center;
+}
+
+.signup-user-icon {
+  @apply w-8 h-8 text-white;
+}
+
+.signup-title-group {
+  @apply space-y-2;
+}
+
+.signup-main-title {
+  @apply text-3xl font-bold text-gray-900 text-balance;
+}
+
+.signup-subtitle {
+  @apply text-gray-600 mt-2;
+}
+
+/* Sign Up Form Card */
+.signup-form-card {
+  @apply shadow-lg border-0;
+}
+
+.signup-card-header {
+  @apply text-center pb-4;
+}
+
+.signup-card-title {
+  @apply text-xl font-semibold text-gray-900;
+}
+
+.signup-card-description {
+  @apply text-sm text-gray-600;
+}
+
+.signup-card-content {
+  @apply space-y-4;
+}
+
+/* Form Fields */
+.fullname-field-container,
+.email-field-container,
+.username-field-container,
+.password-field-container,
+.confirm-password-field-container {
+  @apply space-y-2;
+}
+
+.signup-field-label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.signup-input-field {
+  @apply h-12 border-gray-200 focus:border-green-500 focus:ring-green-500;
+}
+
+/* Submit Button */
+.signup-submit-button {
+  @apply w-full h-12 bg-green-500 hover:bg-green-600 text-white font-medium mt-6;
+}
+
+/* Footer Section */
+.signup-footer-section {
+  @apply text-center space-y-4;
+}
+
+.signin-link-text {
+  @apply text-gray-600;
+}
+
+.signin-link {
+  @apply text-green-500 hover:text-green-600 font-medium;
+}
+
+.legal-links-text {
+  @apply text-xs text-gray-500;
+}
+
+.terms-link,
+.privacy-link {
+  @apply text-green-500 hover:text-green-600;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .signup-form-wrapper {
+    @apply max-w-sm;
+  }
+  
+  .signup-header-section {
+    @apply space-y-3;
+  }
+  
+  .signup-main-title {
+    @apply text-2xl;
+  }
+}

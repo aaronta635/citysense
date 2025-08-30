@@ -1,0 +1,127 @@
+/* 
+=== LOGIN PAGE CUSTOM STYLES ===
+Modern, clean styling for the login form with consistent theming
+*/
+
+/* Main page container */
+.login-page-container {
+  @apply min-h-screen bg-gray-50 flex items-center justify-center p-4;
+}
+
+.login-form-wrapper {
+  @apply w-full max-w-md space-y-8;
+}
+
+/* Header Section */
+.login-header-section {
+  @apply text-center space-y-4;
+}
+
+.login-icon-container {
+  @apply mx-auto w-16 h-16 bg-green-500 rounded-full flex items-center justify-center;
+}
+
+.login-lock-icon {
+  @apply w-8 h-8 text-white;
+}
+
+.login-title-group {
+  @apply space-y-2;
+}
+
+.login-main-title {
+  @apply text-3xl font-bold text-gray-900 text-balance;
+}
+
+.login-subtitle {
+  @apply text-gray-600 mt-2;
+}
+
+/* Login Form Card */
+.login-form-card {
+  @apply shadow-lg border-0;
+}
+
+.login-card-header {
+  @apply text-center pb-4;
+}
+
+.login-card-title {
+  @apply text-xl font-semibold text-gray-900;
+}
+
+.login-card-description {
+  @apply text-sm text-gray-600;
+}
+
+.login-card-content {
+  @apply space-y-4;
+}
+
+/* Form Fields */
+.email-field-container,
+.password-field-container {
+  @apply space-y-2;
+}
+
+.login-field-label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.login-input-field {
+  @apply h-12 border-gray-200 focus:border-green-500 focus:ring-green-500;
+}
+
+/* Options Section */
+.login-options-section {
+  @apply flex items-center justify-between;
+}
+
+.remember-me-container {
+  @apply flex items-center space-x-2;
+}
+
+.remember-me-checkbox {
+  @apply h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300 rounded;
+}
+
+.remember-me-label {
+  @apply text-sm text-gray-700;
+}
+
+.forgot-password-link {
+  @apply text-sm text-green-500 hover:text-green-600 font-medium;
+}
+
+/* Submit Button */
+.login-submit-button {
+  @apply w-full h-12 bg-green-500 hover:bg-green-600 text-white font-medium mt-6;
+}
+
+/* Footer Section */
+.login-footer-section {
+  @apply text-center space-y-4;
+}
+
+.signup-link-text {
+  @apply text-gray-600;
+}
+
+.signup-link {
+  @apply text-green-500 hover:text-green-600 font-medium;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .login-form-wrapper {
+    @apply max-w-sm;
+  }
+  
+  .login-header-section {
+    @apply space-y-3;
+  }
+  
+  .login-main-title {
+    @apply text-2xl;
+  }
+}
