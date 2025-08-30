@@ -51,11 +51,12 @@ router.get('/weather', citysenseController.getWeather);
  */
 router.get('/pollution', citysenseController.getPollution);
 
+
 /**
  * @swagger
- * /citysense/mood/daily:
+ * /citysense/mood/form:
  *   post:
- *     summary: Submit daily mood
+ *     summary: Submit mood form with suburb and reason
  *     requestBody:
  *       required: true
  *       content:
@@ -63,18 +64,29 @@ router.get('/pollution', citysenseController.getPollution);
  *           schema:
  *             type: object
  *             properties:
- *               suburb:
- *                 type: string
- *               user_mood:
+ *               selectedMood:
  *                 type: string
  *                 enum: [Happy, Neutral, Stressed, Angry, Sad]
- *               explanation:
+ *               reasonText:
+ *                 type: string
+ *               selectedSuburb:
  *                 type: string
  *     responses:
  *       201:
  *         description: Mood submitted successfully
  */
-router.post('/mood/daily', citysenseController.submitDailyMood);
+router.post('/mood/form', citysenseController.submitMoodForm);
+
+/**
+ * @swagger
+ * /citysense/suburbs/stats:
+ *   get:
+ *     summary: Get aggregated mood statistics for all suburbs
+ *     responses:
+ *       200:
+ *         description: Suburb mood statistics
+ */
+router.get('/suburbs/stats', citysenseController.getSuburbMoodStats);
 
 
 module.exports = router;

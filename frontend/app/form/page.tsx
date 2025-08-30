@@ -91,11 +91,11 @@ const SYDNEY_SUBURBS = [
 
 // Mood options with corresponding icons
 const MOOD_OPTIONS = [
-  { value: "happy", label: "Happy", icon: Smile, color: "text-green-500" },
-  { value: "neutral", label: "Neutral", icon: Meh, color: "text-gray-500" },
-  { value: "stressed", label: "Stressed", icon: Frown, color: "text-yellow-500" },
-  { value: "angry", label: "Angry", icon: Angry, color: "text-red-500" },
-  { value: "sad", label: "Sad", icon: Heart, color: "text-blue-500" },
+  { value: "Happy", label: "Happy", icon: Smile, color: "text-green-500" },
+  { value: "Neutral", label: "Neutral", icon: Meh, color: "text-gray-500" },
+  { value: "Stressed", label: "Stressed", icon: Frown, color: "text-yellow-500" },
+  { value: "Angry", label: "Angry", icon: Angry, color: "text-red-500" },
+  { value: "Sad", label: "Sad", icon: Heart, color: "text-blue-500" },
 ]
 
 export default function FeedbackPage() {
@@ -109,14 +109,59 @@ export default function FeedbackPage() {
   const filteredSuburbs = SYDNEY_SUBURBS.filter((suburb) => suburb.toLowerCase().includes(suburbSearch.toLowerCase()))
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    console.log("Sending data:", {
+      selectedMood,
+      reasonText, 
+      selectedSuburb,
+    });
+    
+    if (!selectedMood || !selectedSuburb) {
+      alert('Please select both a mood and a suburb');
+      return;
+    }
+
     console.log("Feedback submitted:", {
       mood: selectedMood,
       reason: reasonText,
       suburb: selectedSuburb,
     })
-    // Here you would typically send the data to your backend
+
+    try {
+      const response = await fetch('http://localhost:3000/v1/citysense/mood/form', {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          selectedMood: selectedMood,
+          reasonText: reasonText, 
+          selectedSuburb: selectedSuburb,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert('Thank you for your feedback!');
+        // Reset form
+        setSelectedMood("");
+        setReasonText("");
+        setSelectedSuburb("");
+        setSuburbSearch("");
+      } else {
+        alert("Error: " + result.message);
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('Error submitting feedback: ' + (error as Error).message);
+    }
   }
 
   return (

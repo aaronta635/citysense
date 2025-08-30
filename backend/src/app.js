@@ -7,12 +7,12 @@ const morgan = require('./config/morgan');
 const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 
 
-mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
-  console.log('Connected to MongoDB');
-});
+// mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
+//   console.log('Connected to MongoDB');
+// });
 const app = express();
 
 if (config.env !== 'test') {
@@ -30,7 +30,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // enable cors
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3001', 'http://localhost:3000'],
+  credentials: true
+}));
 app.options('*', cors());
 
 // v1 api routes
