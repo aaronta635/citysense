@@ -209,9 +209,9 @@ export default function FeedbackPage() {
                     </Label>
                     <Textarea
                       id="reason-textarea"
-                      placeholder="Tell us what's on your mind..."
+                      placeholder="Tell us what&apos;s on your mind..."
                       value={reasonText}
-                      onChange={(e) => setReasonText(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setReasonText(e.target.value)}
                       className="reason-textarea"
                       rows={4}
                     />

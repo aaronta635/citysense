@@ -204,7 +204,7 @@ export default function FeedbackPage() {
                   {/* Question 2: Why reason (Vietnamese) */}
                   <div className="form-field-group">
                     <Label htmlFor="reason-textarea" className="form-field-label">
-                      Why so ? 
+                      Why so? 
                     </Label>
                     <Textarea
                       id="reason-textarea"
