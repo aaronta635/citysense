@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Script from "next/script";
-import styles from "./page.module.css";
+import "../globals.css";
 import { GOOGLE_MAPS_API_KEY } from "./config";
 
 // Sydney map configuration
@@ -184,11 +184,49 @@ export default function SydneySensePage() {
   const [isMapLoading, setIsMapLoading] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
   const [stats, setStats] = useState({ suburbsShown: 11, avgSentiment: "58%" });
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const mapRef = useRef<HTMLDivElement>(null);
 
+  // Toggle dropdown menu
+  const toggleDropdown = () => {
+    console.log("Dropdown clicked, current state:", isDropdownOpen);
+    setIsDropdownOpen(!isDropdownOpen);
+    console.log("New state will be:", !isDropdownOpen);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest(".activity-dropdown")) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   // Convert sentiment score to mood-based color
-  const getSentimentColor = (sentimentScore: number): string => {
+  const getSentimentColor = (
+    sentimentScore: number,
+    moodBreakdown?: MoodBreakdown
+  ): string => {
+    // If moodBreakdown is provided, use the largest mood percentage
+    if (moodBreakdown) {
+      const { happy, neutral, angry } = moodBreakdown;
+      if (happy >= neutral && happy >= angry) return "#4caf50"; // Green for happy
+      if (neutral >= happy && neutral >= angry) return "#ffeb3b"; // Yellow for neutral
+      return "#f44336"; // Red for angry
+    }
+
+    // Fallback to original sentiment score logic
     if (sentimentScore >= 0.66) return "#4caf50"; // Green for happy (66%+)
     if (sentimentScore >= 0.33) return "#ffeb3b"; // Yellow for neutral (33-65%)
     return "#f44336"; // Red for angry (0-32%)
@@ -274,9 +312,9 @@ export default function SydneySensePage() {
       const suburbCircle = new google.maps.Circle({
         center: suburb.center,
         radius: suburb.radius,
-        fillColor: getSentimentColor(suburb.sentiment),
+        fillColor: getSentimentColor(suburb.sentiment, suburb.moodBreakdown),
         fillOpacity: 0.3, // Semi-transparent fill
-        strokeColor: getSentimentColor(suburb.sentiment),
+        strokeColor: getSentimentColor(suburb.sentiment, suburb.moodBreakdown),
         strokeOpacity: 0.8,
         strokeWeight: 2,
         map: mapInstance,
@@ -306,7 +344,8 @@ export default function SydneySensePage() {
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-weight: bold; color: #333;">Sentiment Score:</span>
             <span style="color: ${getSentimentColor(
-              suburb.sentiment
+              suburb.sentiment,
+              suburb.moodBreakdown
             )}; font-weight: bold;">
               ${Math.round(suburb.sentiment * 100)}%
             </span>
@@ -621,7 +660,7 @@ export default function SydneySensePage() {
   }, [isMapLoading, map, mapError]);
 
   return (
-    <div className={styles.dashboard}>
+    <div className="dashboard">
       {/* Google Maps Script */}
       <Script
         src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=visualization`}
@@ -631,13 +670,75 @@ export default function SydneySensePage() {
       />
 
       {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.logo}>SydneySense</div>
-        <div className={styles["header-icons"]}>
-          <svg className={styles.icon} fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
-          </svg>
-          <svg className={styles.icon} fill="currentColor" viewBox="0 0 20 20">
+      <header className="header">
+        <div className="logo">SydneySense</div>
+
+        <div className="header-icons">
+          {/* Recent Activity Dropdown */}
+          <div className="activity-dropdown">
+            <button className="dropdown-trigger">
+              <svg className="icon" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+              </svg>
+              Recent Activity
+              <svg
+                className="dropdown-arrow"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+            </button>
+
+            <div className="dropdown-menu">
+              <div className="dropdown-header">
+                <h4>Recent Activity</h4>
+                <span className="activity-count">3 new</span>
+              </div>
+
+              <div className="dropdown-activities">
+                <div className="dropdown-activity-item">
+                  <div className="activity-dot green"></div>
+                  <div className="dropdown-activity-content">
+                    <div className="dropdown-activity-text">
+                      New positive feedback in Downtown area
+                    </div>
+                    <div className="dropdown-activity-time">2 minutes ago</div>
+                  </div>
+                </div>
+
+                <div className="dropdown-activity-item">
+                  <div className="activity-dot yellow"></div>
+                  <div className="dropdown-activity-content">
+                    <div className="dropdown-activity-text">
+                      Neutral sentiment spike in Park District
+                    </div>
+                    <div className="dropdown-activity-time">15 minutes ago</div>
+                  </div>
+                </div>
+
+                <div className="dropdown-activity-item">
+                  <div className="activity-dot red"></div>
+                  <div className="dropdown-activity-content">
+                    <div className="dropdown-activity-text">
+                      Concerns raised about traffic in Main St
+                    </div>
+                    <div className="dropdown-activity-time">1 hour ago</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="dropdown-footer">
+                <button className="view-all-btn">View All Activity</button>
+              </div>
+            </div>
+          </div>
+
+          <svg className="icon" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
               d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -646,15 +747,14 @@ export default function SydneySensePage() {
           </svg>
         </div>
       </header>
-
       {/* Sidebar */}
-      <aside className={styles.sidebar}>
-        <div className={styles["filter-section"]}>
+      <aside className="sidebar">
+        <div className="filter-section">
           <h3>Mood Filter</h3>
-          <div className={styles["dropdown-container"]}>
+          <div className="dropdown-container">
             <select
               id="sentimentFilter"
-              className={styles["sentiment-dropdown"]}
+              className="sentiment-dropdown"
               onChange={filterBySentiment}
             >
               <option value="all">All Moods</option>
@@ -664,35 +764,19 @@ export default function SydneySensePage() {
             </select>
           </div>
 
-          <div className={styles["filter-info"]}>
+          <div className="filter-info">
             <p>Filter suburbs by community mood</p>
           </div>
 
-          <div className={styles["color-legend"]}>
-            <h4>Color Guide</h4>
-            <div className={styles["legend-item"]}>
-              <span className={`${styles["color-dot"]} ${styles.happy}`}></span>
-              <span>Happy (66-100%)</span>
-            </div>
-            <div className={styles["legend-item"]}>
-              <span
-                className={`${styles["color-dot"]} ${styles.neutral}`}
-              ></span>
-              <span>Neutral (33-65%)</span>
-            </div>
-            <div className={styles["legend-item"]}>
-              <span className={`${styles["color-dot"]} ${styles.angry}`}></span>
-              <span>Angry (0-32%)</span>
-            </div>
-          </div>
+          <div className="color-legend"></div>
         </div>
 
-        <div className={styles["filter-section"]}>
+        <div className="filter-section">
           <h3>Suburb Filter</h3>
-          <div className={styles["dropdown-container"]}>
+          <div className="dropdown-container">
             <select
               id="suburbFilter"
-              className={styles["sentiment-dropdown"]}
+              className="sentiment-dropdown"
               onChange={filterBySuburb}
             >
               <option value="all">All Suburbs</option>
@@ -704,70 +788,61 @@ export default function SydneySensePage() {
             </select>
           </div>
 
-          <div className={styles["filter-info"]}>
+          <div className="filter-info">
             <p>Filter by specific suburb</p>
           </div>
         </div>
 
-        <div className={styles["stats-section"]}>
+        <div className="stats-section">
           <h3>Current View</h3>
-          <div className={styles["stat-item"]}>
-            <span className={styles["stat-label"]}>Suburbs Shown:</span>
-            <span id="suburbsShown" className={styles["stat-value"]}>
+          <div className="stat-item">
+            <span className="stat-label">Suburbs Shown:</span>
+            <span id="suburbsShown" className="stat-value">
               {stats.suburbsShown}
             </span>
           </div>
-          <div className={styles["stat-item"]}>
-            <span className={styles["stat-label"]}>Average Mood:</span>
-            <span id="avgSentiment" className={styles["stat-value"]}>
+          <div className="stat-item">
+            <span className="stat-label">Average Mood:</span>
+            <span id="avgSentiment" className="stat-value">
               {stats.avgSentiment}
             </span>
           </div>
         </div>
 
         <div
-          className={styles["mood-breakdown-section"]}
+          className="mood-breakdown-section"
           id="moodBreakdown"
           style={{ display: "none" }}
         >
           <h3>Mood Breakdown</h3>
-          <div className={styles["mood-bar"]}>
-            <div className={styles["mood-label"]}>Happy 😊</div>
-            <div className={styles["mood-bar-container"]}>
-              <div
-                className={`${styles["mood-bar-fill"]} ${styles.happy}`}
-                id="happyBar"
-              ></div>
+          <div className="mood-bar">
+            <div className="mood-label">Happy 😊</div>
+            <div className="mood-bar-container">
+              <div className="mood-bar-fill happy" id="happyBar"></div>
             </div>
-            <div className={styles["mood-percentage"]} id="happyPercentage">
+            <div className="mood-percentage" id="happyPercentage">
               0%
             </div>
           </div>
-          <div className={styles["mood-bar"]}>
-            <div className={styles["mood-label"]}>Neutral 😐</div>
-            <div className={styles["mood-bar-container"]}>
-              <div
-                className={`${styles["mood-bar-fill"]} ${styles.neutral}`}
-                id="neutralBar"
-              ></div>
+          <div className="mood-bar">
+            <div className="mood-label">Neutral 😐</div>
+            <div className="mood-bar-container">
+              <div className="mood-bar-fill neutral" id="neutralBar"></div>
             </div>
-            <div className={styles["mood-percentage"]} id="neutralPercentage">
+            <div className="mood-percentage" id="neutralPercentage">
               0%
             </div>
           </div>
-          <div className={styles["mood-bar"]}>
-            <div className={styles["mood-label"]}>Angry 😠</div>
-            <div className={styles["mood-bar-container"]}>
-              <div
-                className={`${styles["mood-bar-fill"]} ${styles.angry}`}
-                id="angryBar"
-              ></div>
+          <div className="mood-bar">
+            <div className="mood-label">Angry 😠</div>
+            <div className="mood-bar-container">
+              <div className="mood-bar-fill angry" id="angryBar"></div>
             </div>
-            <div className={styles["mood-percentage"]} id="angryPercentage">
+            <div className="mood-percentage" id="angryPercentage">
               0%
             </div>
           </div>
-          <div className={styles["total-submissions"]}>
+          <div className="total-submissions">
             <span>Total Submissions: </span>
             <span id="totalSubmissions">0</span>
           </div>
@@ -775,14 +850,10 @@ export default function SydneySensePage() {
       </aside>
 
       {/* Main Content */}
-      <main className={styles["main-content"]}>
-        <div className={styles["content-header"]}>
-          <div className={styles["content-title"]}>
-            <svg
-              className={styles.icon}
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
+      <main className="main-content">
+        <div className="content-header">
+          <div className="content-title">
+            <svg className="icon" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
@@ -813,15 +884,8 @@ export default function SydneySensePage() {
           >
             Reload map
           </button>
-          <button
-            className={styles["hide-button"]}
-            onClick={toggleSuburbOverlays}
-          >
-            <svg
-              className={styles.icon}
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
+          <button className="hide-button" onClick={toggleSuburbOverlays}>
+            <svg className="icon" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -832,12 +896,12 @@ export default function SydneySensePage() {
           </button>
         </div>
 
-        <div className={styles["map-container"]}>
+        <div className="map-container">
           {isMapLoading && (
             <div
               style={{
                 width: "100%",
-                height: "600px",
+                height: "100%",
                 backgroundColor: "#f0f0f0",
                 display: "flex",
                 alignItems: "center",
@@ -856,7 +920,7 @@ export default function SydneySensePage() {
             <div
               style={{
                 width: "100%",
-                height: "600px",
+                height: "100%",
                 backgroundColor: "#f0f0f0",
                 display: "flex",
                 alignItems: "center",
@@ -874,10 +938,10 @@ export default function SydneySensePage() {
           <div
             ref={mapRef}
             id="map"
-            className={styles.map}
+            className="map"
             style={{
               width: "100%",
-              height: "600px",
+              height: "100%",
               borderRadius: "12px",
               display: isMapLoading || mapError ? "none" : "block",
             }}
@@ -886,12 +950,12 @@ export default function SydneySensePage() {
       </main>
 
       {/* Right Panel */}
-      <aside className={styles["right-panel"]}>
-        <div className={styles["panel-section"]}>
+      <aside className="right-panel">
+        <div className="panel-section">
           <h3>Key Metrics</h3>
-          <div className={styles["metric-item"]}>
+          <div className="metric-item">
             <svg
-              className={styles["metric-icon"]}
+              className="metric-icon"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -901,29 +965,29 @@ export default function SydneySensePage() {
                 clipRule="evenodd"
               ></path>
             </svg>
-            <div className={styles["metric-content"]}>
+            <div className="metric-content">
               <h4>Overall Sentiment</h4>
-              <div className={styles["metric-value"]}>
-                72% <span className={styles.positive}>Positive</span>
+              <div className="metric-value">
+                72% <span className="positive">Positive</span>
               </div>
             </div>
           </div>
-          <div className={styles["metric-item"]}>
+          <div className="metric-item">
             <svg
-              className={styles["metric-icon"]}
+              className="metric-icon"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
               <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
             </svg>
-            <div className={styles["metric-content"]}>
+            <div className="metric-content">
               <h4>Active Residents</h4>
-              <div className={styles["metric-value"]}>1,247</div>
+              <div className="metric-value">1,247</div>
             </div>
           </div>
-          <div className={styles["metric-item"]}>
+          <div className="metric-item">
             <svg
-              className={styles["metric-icon"]}
+              className="metric-icon"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -933,63 +997,32 @@ export default function SydneySensePage() {
                 clipRule="evenodd"
               ></path>
             </svg>
-            <div className={styles["metric-content"]}>
+            <div className="metric-content">
               <h4>Total Comments</h4>
-              <div className={styles["metric-value"]}>3,891</div>
+              <div className="metric-value">3,891</div>
             </div>
           </div>
-          <div className={styles["metric-item"]}>
+          <div className="metric-item">
             <svg
-              className={styles["metric-icon"]}
+              className="metric-icon"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
               <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
             </svg>
-            <div className={styles["metric-content"]}>
+            <div className="metric-content">
               <h4>Weekly Growth</h4>
-              <div className={styles["metric-value"]}>
-                <span className={styles.growth}>+12%</span>
+              <div className="metric-value">
+                <span className="growth">+12%</span>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className={styles["panel-section"]}>
-          <h3>Recent Activity</h3>
-          <div className={styles["activity-item"]}>
-            <div className={`${styles["activity-dot"]} ${styles.green}`}></div>
-            <div className={styles["activity-content"]}>
-              <div className={styles["activity-text"]}>
-                New positive feedback in Downtown area
-              </div>
-              <div className={styles["activity-time"]}>2 minutes ago</div>
-            </div>
-          </div>
-          <div className={styles["activity-item"]}>
-            <div className={`${styles["activity-dot"]} ${styles.yellow}`}></div>
-            <div className={styles["activity-content"]}>
-              <div className={styles["activity-text"]}>
-                Neutral sentiment spike in Park District
-              </div>
-              <div className={styles["activity-time"]}>15 minutes ago</div>
-            </div>
-          </div>
-          <div className={styles["activity-item"]}>
-            <div className={`${styles["activity-dot"]} ${styles.red}`}></div>
-            <div className={styles["activity-content"]}>
-              <div className={styles["activity-text"]}>
-                Concerns raised about traffic in Main St
-              </div>
-              <div className={styles["activity-time"]}>1 hour ago</div>
             </div>
           </div>
         </div>
       </aside>
 
       {/* Call to Action Button */}
-      <button className={styles["cta-button"]}>
-        <svg className={styles.icon} fill="currentColor" viewBox="0 0 20 20">
+      <button className="cta-button">
+        <svg className="icon" fill="currentColor" viewBox="0 0 20 20">
           <path
             fillRule="evenodd"
             d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
