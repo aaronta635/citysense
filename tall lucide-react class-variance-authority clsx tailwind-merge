@@ -1,0 +1,319 @@
+[1mdiff --git a/frontend/app/form/page.tsx b/frontend/app/form/page.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..12717b4[m
+[1m--- /dev/null[m
+[1m+++ b/frontend/app/form/page.tsx[m
+[36m@@ -0,0 +1,312 @@[m
+[32m+[m[32m"use client"[m
+[32m+[m
+[32m+[m[32mimport type React from "react"[m
+[32m+[m[32mimport { useState } from "react"[m
+[32m+[m[32mimport { Button } from "@/components/ui/button"[m
+[32m+[m[32mimport { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"[m
+[32m+[m[32mimport { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"[m
+[32m+[m[32mimport { Textarea } from "@/components/ui/textarea"[m
+[32m+[m[32mimport { Input } from "@/components/ui/input"[m
+[32m+[m[32mimport { Label } from "@/components/ui/label"[m
+[32m+[m[32mimport { BarChart3, Users, MessageSquare, TrendingUp, MapPin, Heart, Meh, Frown, Angry, Smile } from "lucide-react"[m
+[32m+[m
+[32m+[m[32m// Sydney suburbs data for the searchable dropdown[m
+[32m+[m[32mconst SYDNEY_SUBURBS = [[m
+[32m+[m[32m  // Eastern Suburbs[m
+[32m+[m[32m  "Bondi", "Bondi Beach", "Bondi Junction", "Bellevue Hill", "Dover Heights", "North Bondi",[m
+[32m+[m[32m  "Tamarama", "Bronte", "Waverley", "Clovelly", "Coogee", "Randwick", "Kingsford", "Malabar",[m
+[32m+[m[32m  "Little Bay", "La Perouse", "Phillip Bay", "Chifley", "Matraville", "Maroubra", "Pagewood",[m
+[32m+[m[32m  "Eastgardens", "Hillsdale", "Banksmeadow", "Botany", "Daceyville", "Eastlakes", "Mascot",[m
+[32m+[m[41m  [m
+[32m+[m[32m  // Inner City & Inner West[m
+[32m+[m[32m  "Surry Hills", "Paddington", "Newtown", "Glebe", "Darlinghurst", "Potts Point", "Kings Cross",[m
+[32m+[m[32m  "Woollahra", "Double Bay", "Rose Bay", "Vaucluse", "Watsons Bay", "Alexandria", "Redfern",[m
+[32m+[m[32m  "Chippendale", "Ultimo", "Pyrmont", "The Rocks", "Circular Quay", "Millers Point",[m
+[32m+[m[32m  "Balmain", "Rozelle", "Leichhardt", "Annandale", "Camperdown", "Enmore", "Stanmore",[m
+[32m+[m[32m  "Petersham", "Lilyfield", "Birchgrove", "Drummoyne", "Waterloo", "Zetland", "Rosebery",[m
+[32m+[m[32m  "Beaconsfield", "Eveleigh", "Erskineville", "St Peters", "Sydenham", "Tempe", "Wolli Creek",[m
+[32m+[m[32m  "Arncliffe", "Banksia", "Rockdale", "Kogarah", "Carlton", "Allawah", "Hurstville",[m
+[32m+[m[32m  "Penshurst", "Mortdale", "Oatley", "Como", "Peakhurst", "Lugarno", "Riverwood",[m
+[32m+[m[41m  [m
+[32m+[m[32m  // Northern Beaches[m
+[32m+[m[32m  "Fairlight", "Manly", "Seaforth", "Balgowlah", "Clontarf", "Mosman", "Cremorne",[m
+[32m+[m[32m  "Neutral Bay", "North Sydney", "Crows Nest", "Cammeray", "Kirribilli", "Milsons Point",[m
+[32m+[m[32m  "Lavender Bay", "Waverton", "Wollstonecraft", "Greenwich", "Artarmon", "Chatswood",[m
+[32m+[m[32m  "Roseville", "Lindfield", "Killara", "Gordon", "Pymble", "Turramurra", "St Ives",[m
+[32m+[m[32m  "Belrose", "Frenchs Forest", "Forestville", "Davidson", "Dee Why", "Curl Curl",[m
+[32m+[m[32m  "Freshwater", "Queenscliff", "Collaroy", "Narrabeen", "Warriewood", "Mona Vale",[m
+[32m+[m[32m  "Newport", "Avalon", "Palm Beach", "Whale Beach",[m
+[32m+[m[41m  [m
+[32m+[m[32m  // Sutherland Shire[m
+[32m+[m[32m  "Cronulla", "Caringbah", "Miranda", "Sylvania", "Gymea", "Kirrawee", "Sutherland",[m
+[32m+[m[32m  "Engadine", "Heathcote", "Loftus", "Yarrawarrah", "Bundeena", "Maianbar", "Kurnell",[m
+[32m+[m[32m  "Grays Point", "Yowie Bay", "Lilli Pilli", "Port Hacking", "Dolans Bay", "Burraneer",[m
+[32m+[m[32m  "Woolooware", "Taren Point", "Sans Souci", "Ramsgate", "Kogarah Bay", "Beverley Park",[m
+[32m+[m[32m  "Monterey", "Brighton-Le-Sands",[m
+[32m+[m[41m  [m
+[32m+[m[32m  // Western Suburbs[m
+[32m+[m[32m  "Padstow", "Revesby", "Panania", "East Hills", "Milperra", "Condell Park", "Bankstown",[m
+[32m+[m[32m  "Yagoona", "Birrong", "Regents Park", "Chullora", "Greenacre", "Lakemba", "Wiley Park",[m
+[32m+[m[32m  "Punchbowl", "Roselands", "Campsie", "Belmore", "Canterbury", "Hurlstone Park",[m
+[32m+[m[32m  "Dulwich Hill", "Marrickville", "Ashfield", "Summer Hill", "Croydon", "Burwood",[m
+[32m+[m[32m  "Strathfield", "Homebush", "Concord", "Cabarita", "Rhodes", "Liberty Grove",[m
+[32m+[m[32m  "Breakfast Point", "Meadowbank", "Ryde", "Putney", "Gladesville", "Hunters Hill",[m
+[32m+[m[32m  "Woolwich", "Henley", "Abbotsford", "Wareemba", "Russell Lea", "Five Dock",[m
+[32m+[m[32m  "Canada Bay", "Chiswick", "North Ryde", "East Ryde", "Macquarie Park", "West Ryde",[m
+[32m+[m[32m  "Denistone", "Eastwood", "Epping", "Carlingford", "Telopea", "Dundas", "Ermington",[m
+[32m+[m[32m  "Rydalmere", "Parramatta", "North Parramatta", "Westmead", "Wentworthville",[m
+[32m+[m[32m  "Pendle Hill", "Toongabbie", "Seven Hills", "Blacktown", "Marayong", "Kings Park",[m
+[32m+[m[32m  "Quakers Hill", "Acacia Gardens", "Kellyville", "Baulkham Hills", "Castle Hill",[m
+[32m+[m[32m  "Winston Hills", "Northmead", "Constitution Hill", "Girraween", "Greystanes",[m
+[32m+[m[32m  "Pemulwuy", "Prospect", "Merrylands", "Guildford", "Yennora", "Chester Hill",[m
+[32m+[m[32m  "Sefton", "Bass Hill", "Lansvale", "Canley Vale", "Canley Heights", "Cabramatta",[m
+[32m+[m[32m  "Lansdowne", "Villawood", "Fairfield", "Carramar", "Smithfield", "Wetherill Park",[m
+[32m+[m[32m  "Prairiewood", "Wakeley", "Edensor Park", "Abbotsbury", "Cecil Hills", "Bonnyrigg",[m
+[32m+[m[32m  "Greenfield Park", "Mount Pritchard", "Liverpool", "Warwick Farm", "Chipping Norton",[m
+[32m+[m[32m  "Hammondville", "Moorebank", "Wattle Grove", "Holsworthy", "Casula", "Prestons",[m
+[32m+[m[32m  "Lurnea", "Cartwright", "Sadleir", "Ashcroft", "Busby", "Heckenberg", "Green Valley",[m
+[32m+[m[32m  "Hinchinbrook", "Cecil Park", "Kemps Creek", "Austral", "Leppington", "Denham Court",[m
+[32m+[m[32m  "Ingleburn", "Macquarie Fields", "Minto", "St Andrews", "Raby", "Kearns",[m
+[32m+[m[32m  "Eschol Park", "Eagle Vale", "Claymore", "Campbelltown", "Leumeah", "Blair Athol",[m
+[32m+[m[32m  "Woodbine", "Ambarvale", "Rosemeadow", "Bradbury", "Airds", "Kentlyn", "Wedderburn",[m
+[32m+[m[32m  "Appin", "Menangle", "Douglas Park", "Picton", "Tahmoor", "Bargo", "Yanderra",[m
+[32m+[m[32m  "Mittagong", "Bowral", "Moss Vale", "Berrima", "Robertson", "Kangaroo Valley",[m
+[32m+[m[41m  [m
+[32m+[m[32m  // South Coast[m
+[32m+[m[32m  "Nowra", "Bomaderry", "North Nowra", "South Nowra", "West Nowra", "Berry", "Gerringong",[m
+[32m+[m[32m  "Kiama", "Shellharbour", "Warilla", "Barrack Heights", "Oak Flats", "Albion Park",[m
+[32m+[m[32m  "Albion Park Rail", "Dapto", "Horsley", "Koonawarra", "Kanahooka", "Berkeley",[m
+[32m+[m[32m  "Lake Heights", "Cringila", "Warrawong", "Port Kembla", "Wollongong", "North Wollongong",[m
+[32m+[m[32m  "Fairy Meadow", "Towradgi", "East Corrimal", "Corrimal", "Bellambi", "Russell Vale",[m
+[32m+[m[32m  "Thirroul", "Austinmer", "Coledale", "Wombarra", "Scarborough", "Clifton", "Coalcliff",[m
+[32m+[m[32m  "Stanwell Park", "Helensburgh", "Waterfall",[m
+[32m+[m[41m  [m
+[32m+[m[32m  // North Shore[m
+[32m+[m[32m  "Moore Park", "Centennial Park", "Sydney", "Haymarket", "Dawes Point", "Walsh Bay",[m
+[32m+[m[32m  "McMahons Point", "Blues Point", "Cremorne Point", "Kurraba Point", "Northbridge",[m
+[32m+[m[32m  "Willoughby", "Castlecrag", "Middle Cove", "Castle Cove", "Chatswood West",[m
+[32m+[m[32m  "Lane Cove", "Lane Cove North", "Lane Cove West", "Linley Point", "Riverview",[m
+[32m+[m[32m  "Longueville", "Northwood"[m
+[32m+[m[32m][m
+[32m+[m
+[32m+[m[32m// Mood options with corresponding icons[m
+[32m+[m[32mconst MOOD_OPTIONS = [[m
+[32m+[m[32m  { value: "happy", label: "Happy", icon: Smile, color: "text-green-500" },[m
+[32m+[m[32m  { value: "neutral", label: "Neutral", icon: Meh, color: "text-gray-500" },[m
+[32m+[m[32m  { value: "stressed", label: "Stressed", icon: Frown, color: "text-yellow-500" },[m
+[32m+[m[32m  { value: "angry", label: "Angry", icon: Angry, color: "text-red-500" },[m
+[32m+[m[32m  { value: "sad", label: "Sad", icon: Heart, color: "text-blue-500" },[m
+[32m+[m[32m][m
+[32m+[m
+[32m+[m[32mexport default function FeedbackPage() {[m
+[32m+[m[32m  // Form state management[m
+[32m+[m[32m  const [selectedMood, setSelectedMood] = useState<string>("")[m
+[32m+[m[32m  const [reasonText, setReasonText] = useState<string>("")[m
+[32m+[m[32m  const [selectedSuburb, setSelectedSuburb] = useState<string>("")[m
+[32m+[m[32m  const [suburbSearch, setSuburbSearch] = useState<string>("")[m
+[32m+[m
+[32m+[m[32m  // Filter suburbs based on search input[m
+[32m+[m[32m  const filteredSuburbs = SYDNEY_SUBURBS.filter((suburb) => suburb.toLowerCase().includes(suburbSearch.toLowerCase()))[m
+[32m+[m
+[32m+[m[32m  // Handle form submission[m
+[32m+[m[32m  const handleSubmit = (e: React.FormEvent) => {[m
+[32m+[m[32m    e.preventDefault()[m
+[32m+[m[32m    console.log("Feedback submitted:", {[m
+[32m+[m[32m      mood: selectedMood,[m
+[32m+[m[32m      reason: reasonText,[m
+[32m+[m[32m      suburb: selectedSuburb,[m
+[32m+[m[32m    })[m
+[32m+[m[32m    // Here you would typically send the data to your backend[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <div className="feedback-page-container">[m
+[32m+[m[32m      {/* Main layout wrapper with sidebar and content */}[m
+[32m+[m[32m      <div className="page-layout-grid">[m
+[32m+[m[32m        {/* Left Sidebar Navigation */}[m
+[32m+[m[32m        <aside className="sidebar-navigation">[m
+[32m+[m[32m          <div className="sidebar-header">[m
+[32m+[m[32m            <h1 className="sidebar-brand-title">CitySense</h1>[m
+[32m+[m[32m          </div>[m
+[32m+[m
+[32m+[m[32m          <nav className="sidebar-menu">[m
+[32m+[m[32m            <div className="sidebar-menu-item active">[m
+[32m+[m[32m              <BarChart3 className="sidebar-menu-icon" />[m
+[32m+[m[32m              <span>Heat Map</span>[m
+[32m+[m[32m            </div>[m
+[32m+[m[32m            <div className="sidebar-menu-item">[m
+[32m+[m[32m              <Users className="sidebar-menu-icon" />[m
+[32m+[m[32m              <span>Analytics</span>[m
+[32m+[m[32m            </div>[m
+[32m+[m[32m            <div className="sidebar-menu-item current">[m
+[32m+[m[32m              <MessageSquare className="sidebar-menu-icon" />[m
+[32m+[m[32m              <span>Feedback</span>[m
+[32m+[m[32m            </div>[m
+[32m+[m[32m            {/* <div className="sidebar-menu-item"> */}[m
+[32m+[m[32m              {/* <TrendingUp className="sidebar-menu-icon" /> */}[m
+[32m+[m[32m              {/* <span>Settings</span> */}[m
+[32m+[m[32m            {/* </div> */}[m
+[32m+[m[32m          </nav>[m
+[32m+[m[32m        </aside>[m
+[32m+[m
+[32m+[m[32m        {/* Main Content Area */}[m
+[32m+[m[32m        <main className="main-content-area">[m
+[32m+[m[32m          {/* Page Header Section */}[m
+[32m+[m[32m          <header className="page-header-section">[m
+[32m+[m[32m            <div className="page-title-container">[m
+[32m+[m[32m              <h1 className="page-main-title">Community Feedback</h1>[m
+[32m+[m[32m              <p className="page-subtitle">Share your thoughts and help improve our community</p>[m
+[32m+[m[32m            </div>[m
+[32m+[m[32m            <Button className="submit-feedback-button">[m
+[32m+[m[32m              <MessageSquare className="button-icon" />[m
+[32m+[m[32m              Submit Feedback[m
+[32m+[m[32m            </Button>[m
+[32m+[m[32m          </header>[m
+[32m+[m
+[32m+[m[32m          {/* Content Grid Layout */}[m
+[32m+[m[32m          <div className="content-grid-layout">[m
+[32m+[m[32m            {/* Feedback Form Card */}[m
+[32m+[m[32m            <Card className="feedback-form-card">[m
+[32m+[m[32m              <CardHeader className="form-card-header">[m
+[32m+[m[32m                <CardTitle className="form-card-title">Share Your Feedback</CardTitle>[m
+[32m+[m[32m                <CardDescription className="form-card-description">[m
+[32m+[m[32m                  Help us understand what's happening in your community[m
+[32m+[m[32m                </CardDescription>[m
+[32m+[m[32m              </CardHeader>[m
+[32m+[m
+[32m+[m[32m              <CardContent className="form-card-content">[m
+[32m+[m[32m                <form onSubmit={handleSubmit} className="feedback-form">[m
+[32m+[m[32m                  {/* Question 1: How are you feeling today? */}[m
+[32m+[m[32m                  <div className="form-field-group">[m
+[32m+[m[32m                    <Label htmlFor="mood-select" className="form-field-label">[m
+[32m+[m[32m                      How are you feeling today?[m
+[32m+[m[32m                    </Label>[m
+[32m+[m[32m                    <Select value={selectedMood} onValueChange={setSelectedMood}>[m
+[32m+[m[32m                      <SelectTrigger className="mood-select-trigger">[m
+[32m+[m[32m                        <SelectValue placeholder="Select your mood" />[m
+[32m+[m[32m                      </SelectTrigger>[m
+[32m+[m[32m                      <SelectContent className="mood-select-content">[m
+[32m+[m[32m                        {MOOD_OPTIONS.map((mood) => {[m
+[32m+[m[32m                          const IconComponent = mood.icon[m
+[32m+[m[32m                          return ([m
+[32m+[m[32m                            <SelectItem key={mood.value} value={mood.value} className="mood-select-item">[m
+[32m+[m[32m                              <div className="mood-option-container">[m
+[32m+[m[32m                                <IconComponent className={`mood-icon ${mood.color}`} />[m
+[32m+[m[32m                                <span className="mood-label">{mood.label}</span>[m
+[32m+[m[32m                              </div>[m
+[32m+[m[32m                            </SelectItem>[m
+[32m+[m[32m                          )[m
+[32m+[m[32m                        })}[m
+[32m+[m[32m                      </SelectContent>[m
+[32m+[m[32m                    </Select>[m
+[32m+[m[32m                  </div>[m
+[32m+[m
+[32m+[m[32m                  {/* Question 2: Why reason (Vietnamese) */}[m
+[32m+[m[32m                  <div className="form-field-group">[m
+[32m+[m[32m                    <Label htmlFor="reason-textarea" className="form-field-label">[m
+[32m+[m[32m                      Why so ?[m[41m [m
+[32m+[m[32m                    </Label>[m
+[32m+[m[32m                    <Textarea[m
+[32m+[m[32m                      id="reason-textarea"[m
+[32m+[m[32m                      placeholder="Tell us what's on your mind..."[m
+[32m+[m[32m                      value={reasonText}[m
+[32m+[m[32m                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setReasonText(e.target.value)}[m
+[32m+[m[32m                      className="reason-textarea"[m
+[32m+[m[32m                      rows={4}[m
+[32m+[m[32m                    />[m
+[32m+[m[32m                  </div>[m
+[32m+[m
+[32m+[m[32m                  {/* Question 3: Suburbs in Sydney */}[m
+[32m+[m[32m                  <div className="form-field-group">[m
+[32m+[m[32m                    <Label htmlFor="suburb-select" className="form-field-label">[m
+[32m+[m[32m                      Suburbs in Sydney[m
+[32m+[m[32m                    </Label>[m
+[32m+[m[32m                    <div className="suburb-search-container">[m
+[32m+[m[32m                      <Input[m
+[32m+[m[32m                        type="text"[m
+[32m+[m[32m                        placeholder="Search suburbs..."[m
+[32m+[m[32m                        value={suburbSearch}[m
+[32m+[m[32m                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSuburbSearch(e.target.value)}[m
+[32m+[m[32m                        className="suburb-search-input"[m
+[32m+[m[32m                      />[m
+[32m+[m[32m                      <Select value={selectedSuburb} onValueChange={setSelectedSuburb}>[m
+[32m+[m[32m                        <SelectTrigger className="suburb-select-trigger">[m
+[32m+[m[32m                          <SelectValue placeholder="Select location" />[m
+[32m+[m[32m                        </SelectTrigger>[m
+[32m+[m[32m                        <SelectContent className="suburb-select-content">[m
+[32m+[m[32m                          {filteredSuburbs.map((suburb) => ([m
+[32m+[m[32m                            <SelectItem key={suburb} value={suburb} className="suburb-select-item">[m
+[32m+[m[32m                              <div className="suburb-option-container">[m
+[32m+[m[32m                                <MapPin className="suburb-icon" />[m
+[32m+[m[32m                                <span className="suburb-name">{suburb}</span>[m
+[32m+[m[32m                              </div>[m
+[32m+[m[32m                            </SelectItem>[m
+[32m+[m[32m                          ))}[m
+[32m+[m[32m                        </SelectContent>[m
+[32m+[m[32m                      </Select>[m
+[32m+[m[32m                    </div>[m
+[32m+[m[32m                  </div>[m
+[32m+[m
+[32m+[m[32m                  {/* Submit Button */}[m
+[32m+[m[32m                  <Button type="submit" className="form-submit-button">[m
+[32m+[m[32m                    <MessageSquare className="button-icon" />[m
+[32m+[m[32m                    Submit Feedback[m
+[32m+[m[32m                  </Button>[m
+[32m+[m[32m                </form>[m
+[32m+[m[32m              </CardContent>[m
+[32m+[m[32m            </Card>[m
+[32m+[m
+[32m+[m[32m            {/* Key Metrics Sidebar */}[m
+[32m+[m[32m            <Card className="metrics-sidebar-card">[m
+[32m+[m[32m              <CardHeader className="metrics-card-header">[m
+[32m+[m[32m                <CardTitle className="metrics-card-title">Key Metrics</CardTitle>[m
+[32m+[m[32m              </CardHeader>[m
+[32m+[m[32m              <CardContent className="metrics-card-content">[m
+[32m+[m[32m                <div className="metric-item">[m
+[32m+[m[32m                  <div className="metric-icon-container sentiment">[m
+[32m+[m[32m                    <Heart className="metric-icon" />[m
+[32m+[m[32m                  </div>[m
+[32m+[m[32m                  <div className="metric-details">[m
+[32m+[m[32m                    <span className="metric-label">Overall Sentiment</span>[m
+[32m+[m[32m                    <span className="metric-value">72%</span>[m
+[32m+[m[32m                    <span className="metric-sublabel">Positive</span>[m
+[32m+[m[32m                  </div>[m
+[32m+[m[32m                </div>[m
+[32m+[m
+[32m+[m[32m                <div className="metric-item">[m
+[32m+[m[32m                  <div className="metric-icon-container residents">[m
+[32m+[m[32m                    <Users className="metric-icon" />[m
+[32m+[m[32m                  </div>[m
+[32m+[m[32m                  <div className="metric-details">[m
+[32m+[m[32m                    <span className="metric-label">Active Residents</span>[m
+[32m+[m[32m                    <span className="metric-value">1,247</span>[m
+[32m+[m[32m                  </div>[m
+[32m+[m[32m                </div>[m
+[32m+[m
+[32m+[m[32m                <div className="metric-item">[m
+[32m+[m[32m                  <div className="metric-icon-container comments">[m
+[32m+[m[32m                    <MessageSquare className="metric-icon" />[m
+[32m+[m[32m                  </div>[m
+[32m+[m[32m                  <div className="metric-details">[m
+[32m+[m[32m                    <span className="metric-label">Total Comments</span>[m
+[32m+[m[32m                    <span className="metric-value">3,891</span>[m
+[32m+[m[32m                  </div>[m
+[32m+[m[32m                </div>[m
+[32m+[m
+[32m+[m[32m                <div className="metric-item">[m
+[32m+[m[32m                  <div className="metric-icon-container growth">[m
+[32m+[m[32m                    <TrendingUp className="metric-icon" />[m
+[32m+[m[32m                  </div>[m
+[32m+[m[32m                  <div className="metric-details">[m
+[32m+[m[32m                    <span className="metric-label">Weekly Growth</span>[m
+[32m+[m[32m                    <span className="metric-value growth-positive">+12%</span>[m
+[32m+[m[32m                  </div>[m
+[32m+[m[32m                </div>[m
+[32m+[m[32m              </CardContent>[m
+[32m+[m[32m            </Card>[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m        </main>[m
+[32m+[m[32m      </div>[m
+[32m+[m[32m    </div>[m
+[32m+[m[32m  )[m
+[32m+[m[32m}[m
+* Unmerged path frontend/app/page.tsx
