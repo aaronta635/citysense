@@ -233,7 +233,10 @@ Left sidebar with navigation menu items
 }
 
 .sidebar-brand-title {
-  @apply text-2xl font-bold text-blue-600;
+  @apply text-2xl font-bold ;
+  color: rgb(21, 189, 105);
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
 }
 
 .sidebar-menu {
@@ -269,7 +272,10 @@ Right side content with header and form
 }
 
 .page-main-title {
-  @apply text-3xl font-bold text-gray-900;
+  @apply text-3xl font-bold;
+  color: rgb(21, 189, 105);
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
 }
 
 .page-subtitle {
@@ -330,7 +336,10 @@ Individual form elements with consistent spacing
 }
 
 .form-field-label {
-  @apply text-sm font-medium text-gray-700;
+  @apply text-sm font-medium;
+  color: rgb(21, 189, 105);
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
 }
 
 /* Mood selection dropdown styles */
@@ -389,7 +398,10 @@ Individual form elements with consistent spacing
 }
 
 .suburb-icon {
-  @apply w-4 h-4 text-gray-500;
+  @apply w-4 h-4;
+  color: rgb(21, 189, 105);
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
 }
 
 .suburb-name {
