@@ -312,10 +312,12 @@ Main form container with proper spacing
 */
 .feedback-form-card {
   @apply shadow-sm border border-gray-200;
+  background-color: rgb(255, 255, 255);
 }
 
 .form-card-header {
   @apply bg-blue-50 border-b border-blue-100;
+  background-color: rgb(255, 255, 255);
 }
 
 .form-card-title {
@@ -327,7 +329,7 @@ Main form container with proper spacing
 
 .form-card-description {
   @apply text-blue-700;
-  color: rgb(21, 189, 105);
+  color: rgb(0,0,0);
   font-family: "Inter", sans-serif;
   font-weight: 500;
 }
@@ -350,9 +352,10 @@ Individual form elements with consistent spacing
 
 .form-field-label {
   @apply text-sm font-medium;
-  color: rgb(21, 189, 105);
+  color: rgb(0,0,0);
   font-family: "Inter", sans-serif;
   font-weight: 500;
+  font-size: 16px;
 }
 
 /* Mood selection dropdown styles */
@@ -421,9 +424,14 @@ Individual form elements with consistent spacing
   @apply text-sm;
 }
 
-/* Form submit button */
+/* Form submit button  at the end of the form , !!!not the pop up */
 .form-submit-button {
   @apply w-full bg-blue-600 hover:bg-blue-700 text-white mt-6;
+  background-color: rgb(21, 189, 105);
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 25px; 
+  
 }
 
 /* 
@@ -436,6 +444,7 @@ Right sidebar with key metrics display
 
 .metrics-card-header {
   @apply bg-gray-50 border-b border-gray-100;
+  background-color: rgb(255, 255, 255);
 }
 
 .metrics-card-title {
