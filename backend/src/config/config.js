@@ -11,6 +11,7 @@ const envVarsSchema = Joi.object()
     MONGODB_URL: Joi.string().description('MongoDB URL'),
     WEATHER_API_KEY: Joi.string().description('Weather API key'),
     POLLUTION_API_KEY: Joi.string().description('Air pollution API key'),
+    JWT_SECRET: Joi.string().description('JWT secret key'),
   })
   .unknown();
 
@@ -30,6 +31,10 @@ module.exports = {
   },
   env: envVars.NODE_ENV,
   port: envVars.PORT,
+  jwt: {
+    secret: envVars.JWT_SECRET || 'citysense-super-secret-jwt-key-2024-development-only',
+    expiresIn: '7d', // Token expires in 7 days
+  },
   apis: {
     weather: {
       key: envVars.WEATHER_API_KEY,

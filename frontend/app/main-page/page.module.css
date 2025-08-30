@@ -19,17 +19,26 @@
   justify-content: space-between;
   padding: 0 30px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  gap: 20px;
 }
 
 .logo {
   font-size: 24px;
   font-weight: bold;
   color: rgb(21, 189, 105);
+  flex-shrink: 0;
+}
+
+.userWelcome {
+  font-size: 16px;
+  color: #666;
+  font-weight: 500;
 }
 
 .headerIcons {
   display: flex;
   gap: 20px;
+  flex-shrink: 0;
 }
 
 .icon {

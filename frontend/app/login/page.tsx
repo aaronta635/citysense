@@ -1,6 +1,6 @@
 "use client"
 import "./login.css";
-
+import { useRouter } from "next/navigation";
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,16 +11,40 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Login attempt:", { email, password })
+    try {
+      const response = await fetch('http://localhost:3000/v1/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Store token and user data in localStorage
+        localStorage.setItem('token', data.data.token)
+        localStorage.setItem('user', JSON.stringify(data.data.user))
+        
+        // Redirect to main page
+        router.push('/main-page')
+      } else {
+        setError(data.message || 'Login failed')
+      }
+    } catch (err) {
+      setError('Network error. Please try again.')
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
   return (
@@ -40,9 +64,14 @@ export default function LoginPage() {
         {/* Login Form */}
         <Card className="bg-white shadow-xl border-0">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-2xl font-semibold text-center">Sign in</CardTitle>
+            <CardTitle className="text-2xl font-semibold text-center text-black">Sign in</CardTitle>
           </CardHeader>
           <CardContent>
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Field */}
               <div className="space-y-2">
@@ -123,6 +152,7 @@ export default function LoginPage() {
             <Button
               variant="link"
               className="text-green-600 hover:text-green-700 p-0 h-auto font-medium"
+              onClick={() => router.push('/signup')}
             >
               Sign up
             </Button>

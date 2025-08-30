@@ -2,6 +2,7 @@ const sequelize = require('./sqlite');
 const Weather = require('../models/weather.model');
 const Pollution = require('../models/pollution.model');
 const Mood = require('../models/mood.model');
+const User = require('../models/user.model');
 
 const initializeDatabase = async () => {
   try {

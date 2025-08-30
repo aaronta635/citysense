@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import Script from "next/script";
+import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import { GOOGLE_MAPS_API_KEY } from "./config";
-import { Users, Heart, MessageSquare, TrendingUp } from "lucide-react";
+import { Users, Heart, MessageSquare, TrendingUp, LogOut } from "lucide-react";
 
 const SYDNEY_CENTER = { lat: -33.8688, lng: 151.2093 };
 const SYDNEY_BOUNDS = {
@@ -73,8 +74,34 @@ export default function SydneySensePage() {
   const [showMoodStats, setShowMoodStats] = useState(false);
   const [suburbData, setSuburbData] = useState<SuburbData[]>([]);
   const [allAvailableSuburbs, setAllAvailableSuburbs] = useState<string[]>([]);
+  const [user, setUser] = useState<{id: number; username: string; email: string; fullName: string} | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
   const mapRef = useRef<HTMLDivElement>(null);
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (token && userData) {
+      setUser(JSON.parse(userData));
+      setIsAuthenticated(true);
+    } else {
+      // Redirect to login if not authenticated
+      router.push('/login');
+    }
+  }, [router]);
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
+    router.push('/login');
+  };
 
   // Function to get coordinates for each suburb using hardcoded data
   const getCoordinatesForSuburb = (suburbName: string): { lat: number; lng: number } => {
@@ -164,7 +191,7 @@ export default function SydneySensePage() {
           console.log('🏘️ Suburb names:', suburbsWithMood.map((s: any) => s.suburb));
           
           // Get coordinates for all suburbs using hardcoded data
-          const transformedData = suburbsWithMood.map((suburbItem: { suburb: string; mood?: { breakdown: any; sentiment?: number } }) => {
+          const transformedData = suburbsWithMood.map((suburbItem: { suburb: string; mood?: { breakdown: { happy: number; neutral: number; angry: number; sad: number; stressed: number; totalSubmissions: number }; sentiment?: number } }) => {
             try {
               // Get coordinates for each suburb
               console.log('🔍 Looking up coordinates for suburb:', suburbItem.suburb);
@@ -199,7 +226,7 @@ export default function SydneySensePage() {
           });
           
           // Filter out any failed suburbs
-          const validTransformedData = transformedData.filter((item: any) => item !== null);
+          const validTransformedData = transformedData.filter((item: SuburbData | null) => item !== null) as SuburbData[];
           console.log('✅ Successfully processed suburbs:', validTransformedData.length);
           console.log('❌ Failed suburbs:', transformedData.length - validTransformedData.length);
           
@@ -619,7 +646,7 @@ export default function SydneySensePage() {
       console.log("Showing all suburbs:", filteredResults.length);
     } else {
       // Check if the selected suburb exists in our data
-      let foundSuburb = suburbData.find(suburb => suburb.name === selectedSuburb);
+              const foundSuburb = suburbData.find(suburb => suburb.name === selectedSuburb);
       
       if (foundSuburb) {
         filteredResults = [foundSuburb];
@@ -1318,6 +1345,11 @@ export default function SydneySensePage() {
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.logo}>CitySense</div>
+        {isAuthenticated && user && (
+          <div className={styles.userWelcome}>
+            Welcome, {user.username}!
+          </div>
+        )}
 
         <div className={styles.headerIcons}>
           {/* Recent Activity Dropdown */}
@@ -1435,28 +1467,30 @@ export default function SydneySensePage() {
                     </svg>
                   </div>
                   <div className={styles.profileInfo}>
-                    <div className={styles.profileName}>John Doe</div>
+                    <div className={styles.profileName}>{user?.fullName || "Guest"}</div>
                     <div className={styles.profileEmail}>
-                      john.doe@example.com
+                      {user?.email || "Not logged in"}
                     </div>
                   </div>
                 </div>
 
                 <div className={styles.profileOptions}>
-                  <div className={`${styles.profileOption} ${styles.logout}`}>
-                    <svg
-                      className={styles.optionIcon}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm0 2h12v8H3V5z"
-                        clipRule="evenodd"
-                      ></path>
-                    </svg>
-                    <span>Sign Out</span>
-                  </div>
+                  {isAuthenticated && (
+                    <div className={`${styles.profileOption} ${styles.logout}`} onClick={handleLogout}>
+                      <svg
+                        className={styles.optionIcon}
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm0 2h12v8H3V5z"
+                          clipRule="evenodd"
+                        ></path>
+                      </svg>
+                      <span>Sign Out</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1879,7 +1913,7 @@ export default function SydneySensePage() {
       </aside>
 
       {/* Call to Action Button */}
-      <button className={styles.ctaButton} title="Submit Feedback">
+      <a href="/form" className={styles.ctaButton} title="Submit Feedback">
         <svg
           width="20"
           height="20"
@@ -1894,7 +1928,7 @@ export default function SydneySensePage() {
           <path d="M13 8H7" />
           <path d="M17 12H7" />
         </svg>
-      </button>
+      </a>
 
       {/* Mood Statistics Hover Button */}
       <div className={styles.moodStatsButtonContainer}>

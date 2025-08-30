@@ -11,83 +11,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { BarChart3, Users, MessageSquare, TrendingUp, MapPin, Heart, Meh, Frown, Angry, Smile } from "lucide-react"
 
-// Sydney suburbs data for the searchable dropdown
+// Simplified Sydney suburbs list matching the main page
 const SYDNEY_SUBURBS = [
-  // Eastern Suburbs
-  "Bondi", "Bondi Beach", "Bondi Junction", "Bellevue Hill", "Dover Heights", "North Bondi",
-  "Tamarama", "Bronte", "Waverley", "Clovelly", "Coogee", "Randwick", "Kingsford", "Malabar",
-  "Little Bay", "La Perouse", "Phillip Bay", "Chifley", "Matraville", "Maroubra", "Pagewood",
-  "Eastgardens", "Hillsdale", "Banksmeadow", "Botany", "Daceyville", "Eastlakes", "Mascot",
-  
-  // Inner City & Inner West
-  "Surry Hills", "Paddington", "Newtown", "Glebe", "Darlinghurst", "Potts Point", "Kings Cross",
-  "Woollahra", "Double Bay", "Rose Bay", "Vaucluse", "Watsons Bay", "Alexandria", "Redfern",
-  "Chippendale", "Ultimo", "Pyrmont", "The Rocks", "Circular Quay", "Millers Point",
-  "Balmain", "Rozelle", "Leichhardt", "Annandale", "Camperdown", "Enmore", "Stanmore",
-  "Petersham", "Lilyfield", "Birchgrove", "Drummoyne", "Waterloo", "Zetland", "Rosebery",
-  "Beaconsfield", "Eveleigh", "Erskineville", "St Peters", "Sydenham", "Tempe", "Wolli Creek",
-  "Arncliffe", "Banksia", "Rockdale", "Kogarah", "Carlton", "Allawah", "Hurstville",
-  "Penshurst", "Mortdale", "Oatley", "Como", "Peakhurst", "Lugarno", "Riverwood",
-  
-  // Northern Beaches
-  "Fairlight", "Manly", "Seaforth", "Balgowlah", "Clontarf", "Mosman", "Cremorne",
-  "Neutral Bay", "North Sydney", "Crows Nest", "Cammeray", "Kirribilli", "Milsons Point",
-  "Lavender Bay", "Waverton", "Wollstonecraft", "Greenwich", "Artarmon", "Chatswood",
-  "Roseville", "Lindfield", "Killara", "Gordon", "Pymble", "Turramurra", "St Ives",
-  "Belrose", "Frenchs Forest", "Forestville", "Davidson", "Dee Why", "Curl Curl",
-  "Freshwater", "Queenscliff", "Collaroy", "Narrabeen", "Warriewood", "Mona Vale",
-  "Newport", "Avalon", "Palm Beach", "Whale Beach",
-  
-  // Sutherland Shire
-  "Cronulla", "Caringbah", "Miranda", "Sylvania", "Gymea", "Kirrawee", "Sutherland",
-  "Engadine", "Heathcote", "Loftus", "Yarrawarrah", "Bundeena", "Maianbar", "Kurnell",
-  "Grays Point", "Yowie Bay", "Lilli Pilli", "Port Hacking", "Dolans Bay", "Burraneer",
-  "Woolooware", "Taren Point", "Sans Souci", "Ramsgate", "Kogarah Bay", "Beverley Park",
-  "Monterey", "Brighton-Le-Sands",
-  
-  // Western Suburbs
-  "Padstow", "Revesby", "Panania", "East Hills", "Milperra", "Condell Park", "Bankstown",
-  "Yagoona", "Birrong", "Regents Park", "Chullora", "Greenacre", "Lakemba", "Wiley Park",
-  "Punchbowl", "Roselands", "Campsie", "Belmore", "Canterbury", "Hurlstone Park",
-  "Dulwich Hill", "Marrickville", "Ashfield", "Summer Hill", "Croydon", "Burwood",
-  "Strathfield", "Homebush", "Concord", "Cabarita", "Rhodes", "Liberty Grove",
-  "Breakfast Point", "Meadowbank", "Ryde", "Putney", "Gladesville", "Hunters Hill",
-  "Woolwich", "Henley", "Abbotsford", "Wareemba", "Russell Lea", "Five Dock",
-  "Canada Bay", "Chiswick", "North Ryde", "East Ryde", "Macquarie Park", "West Ryde",
-  "Denistone", "Eastwood", "Epping", "Carlingford", "Telopea", "Dundas", "Ermington",
-  "Rydalmere", "Parramatta", "North Parramatta", "Westmead", "Wentworthville",
-  "Pendle Hill", "Toongabbie", "Seven Hills", "Blacktown", "Marayong", "Kings Park",
-  "Quakers Hill", "Acacia Gardens", "Kellyville", "Baulkham Hills", "Castle Hill",
-  "Winston Hills", "Northmead", "Constitution Hill", "Girraween", "Greystanes",
-  "Pemulwuy", "Prospect", "Merrylands", "Guildford", "Yennora", "Chester Hill",
-  "Sefton", "Bass Hill", "Lansvale", "Canley Vale", "Canley Heights", "Cabramatta",
-  "Lansdowne", "Villawood", "Fairfield", "Carramar", "Smithfield", "Wetherill Park",
-  "Prairiewood", "Wakeley", "Edensor Park", "Abbotsbury", "Cecil Hills", "Bonnyrigg",
-  "Greenfield Park", "Mount Pritchard", "Liverpool", "Warwick Farm", "Chipping Norton",
-  "Hammondville", "Moorebank", "Wattle Grove", "Holsworthy", "Casula", "Prestons",
-  "Lurnea", "Cartwright", "Sadleir", "Ashcroft", "Busby", "Heckenberg", "Green Valley",
-  "Hinchinbrook", "Cecil Park", "Kemps Creek", "Austral", "Leppington", "Denham Court",
-  "Ingleburn", "Macquarie Fields", "Minto", "St Andrews", "Raby", "Kearns",
-  "Eschol Park", "Eagle Vale", "Claymore", "Campbelltown", "Leumeah", "Blair Athol",
-  "Woodbine", "Ambarvale", "Rosemeadow", "Bradbury", "Airds", "Kentlyn", "Wedderburn",
-  "Appin", "Menangle", "Douglas Park", "Picton", "Tahmoor", "Bargo", "Yanderra",
-  "Mittagong", "Bowral", "Moss Vale", "Berrima", "Robertson", "Kangaroo Valley",
-  
-  // South Coast
-  "Nowra", "Bomaderry", "North Nowra", "South Nowra", "West Nowra", "Berry", "Gerringong",
-  "Kiama", "Shellharbour", "Warilla", "Barrack Heights", "Oak Flats", "Albion Park",
-  "Albion Park Rail", "Dapto", "Horsley", "Koonawarra", "Kanahooka", "Berkeley",
-  "Lake Heights", "Cringila", "Warrawong", "Port Kembla", "Wollongong", "North Wollongong",
-  "Fairy Meadow", "Towradgi", "East Corrimal", "Corrimal", "Bellambi", "Russell Vale",
-  "Thirroul", "Austinmer", "Coledale", "Wombarra", "Scarborough", "Clifton", "Coalcliff",
-  "Stanwell Park", "Helensburgh", "Waterfall",
-  
-  // North Shore
-  "Moore Park", "Centennial Park", "Sydney", "Haymarket", "Dawes Point", "Walsh Bay",
-  "McMahons Point", "Blues Point", "Cremorne Point", "Kurraba Point", "Northbridge",
-  "Willoughby", "Castlecrag", "Middle Cove", "Castle Cove", "Chatswood West",
-  "Lane Cove", "Lane Cove North", "Lane Cove West", "Linley Point", "Riverview",
-  "Longueville", "Northwood"
+  'Sydney', 'Parramatta', 'Liverpool', 'Penrith', 'Blacktown', 'Campbelltown',
+  'Hurstville', 'Bankstown', 'Auburn', 'Fairfield', 'Cabramatta', 'Canterbury',
+  'Rockdale', 'Kogarah', 'Maroubra', 'Randwick', 'Bondi', 'Manly', 'Chatswood', 'Hornsby'
 ]
 
 // Mood options with corresponding icons
@@ -105,63 +33,76 @@ export default function FeedbackPage() {
   const [reasonText, setReasonText] = useState<string>("")
   const [selectedSuburb, setSelectedSuburb] = useState<string>("")
   const [suburbSearch, setSuburbSearch] = useState<string>("")
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
   // Filter suburbs based on search input
-  const filteredSuburbs = SYDNEY_SUBURBS.filter((suburb) => suburb.toLowerCase().includes(suburbSearch.toLowerCase()))
+  const filteredSuburbs = SYDNEY_SUBURBS.filter((suburb) => 
+    suburb.toLowerCase().includes(suburbSearch.toLowerCase())
+  )
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    console.log("Sending data:", {
-      selectedMood,
-      reasonText, 
-      selectedSuburb,
-    });
     
+    // Form validation
     if (!selectedMood || !selectedSuburb) {
-      alert('Please select both a mood and a suburb');
-      return;
+      setSubmitMessage({ type: 'error', text: 'Please select both a mood and a suburb' })
+      return
     }
 
-    console.log("Feedback submitted:", {
-      mood: selectedMood,
-      reason: reasonText,
-      suburb: selectedSuburb,
-    })
+    if (!reasonText.trim()) {
+      setSubmitMessage({ type: 'error', text: 'Please provide a reason for your mood' })
+      return
+    }
+
+    setIsSubmitting(true)
+    setSubmitMessage(null)
 
     try {
       const response = await fetch('http://localhost:3000/v1/citysense/mood/form', {
-        method: 'POST', 
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           selectedMood: selectedMood,
-          reasonText: reasonText, 
+          reasonText: reasonText.trim(),
           selectedSuburb: selectedSuburb,
+          timestamp: new Date().toISOString(),
         }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const result = await response.json();
+      const result = await response.json()
 
       if (result.success) {
-        alert('Thank you for your feedback!');
+        setSubmitMessage({ type: 'success', text: 'Thank you for your feedback! Your mood has been recorded.' })
+        
         // Reset form
-        setSelectedMood("");
-        setReasonText("");
-        setSelectedSuburb("");
-        setSuburbSearch("");
+        setSelectedMood("")
+        setReasonText("")
+        setSelectedSuburb("")
+        setSuburbSearch("")
+        
+        // Clear success message after 5 seconds
+        setTimeout(() => {
+          setSubmitMessage(null)
+        }, 5000)
       } else {
-        alert("Error: " + result.message);
+        setSubmitMessage({ type: 'error', text: `Error: ${result.message || 'Failed to submit feedback'}` })
       }
     } catch (error) {
-      console.error('Submission error:', error);
-      alert('Error submitting feedback: ' + (error as Error).message);
+      console.error('Submission error:', error)
+      setSubmitMessage({ 
+        type: 'error', 
+        text: `Error submitting feedback: ${error instanceof Error ? error.message : 'Unknown error'}` 
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -173,26 +114,98 @@ export default function FeedbackPage() {
         <aside className="sidebar-navigation">
           <div className="sidebar-header">
             <h1 className="sidebar-brand-title">CitySense</h1>
+            <p className="sidebar-subtitle">Community Feedback Hub</p>
           </div>
 
-          <nav className="sidebar-menu">
-            <div className="sidebar-menu-item active">
-              <BarChart3 className="sidebar-menu-icon" />
-              <span>Heat Map</span>
+          {/* Quick Stats */}
+          <div className="sidebar-section">
+            <h3 className="sidebar-section-title">Today's Activity</h3>
+            <div className="sidebar-stats">
+              <div className="stat-item">
+                <div className="stat-icon-container">
+                  <MessageSquare className="stat-icon" />
+                </div>
+                <div className="stat-content">
+                  <span className="stat-value">24</span>
+                  <span className="stat-label">New Feedback</span>
+                </div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-icon-container">
+                  <Users className="stat-icon" />
+                </div>
+                <div className="stat-content">
+                  <span className="stat-value">18</span>
+                  <span className="stat-label">Active Users</span>
+                </div>
+              </div>
             </div>
-            <div className="sidebar-menu-item">
-              <Users className="sidebar-menu-icon" />
-              <span>Analytics</span>
+          </div>
+
+          {/* Recent Submissions */}
+          <div className="sidebar-section">
+            <h3 className="sidebar-section-title">Recent Submissions</h3>
+            <div className="recent-submissions">
+              <div className="submission-item">
+                <div className="submission-mood happy">😊</div>
+                <div className="submission-details">
+                  <span className="submission-suburb">Bondi</span>
+                  <span className="submission-time">2 min ago</span>
+                </div>
+              </div>
+              <div className="submission-item">
+                <div className="submission-mood neutral">😐</div>
+                <div className="submission-details">
+                  <span className="submission-suburb">Parramatta</span>
+                  <span className="submission-time">5 min ago</span>
+                </div>
+              </div>
+              <div className="submission-item">
+                <div className="submission-mood stressed">😰</div>
+                <div className="submission-details">
+                  <span className="submission-suburb">Liverpool</span>
+                  <span className="submission-time">8 min ago</span>
+                </div>
+              </div>
             </div>
-            <div className="sidebar-menu-item current">
-              <MessageSquare className="sidebar-menu-icon" />
-              <span>Feedback</span>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="sidebar-section">
+            <h3 className="sidebar-section-title">Quick Actions</h3>
+            <div className="quick-actions">
+              <a href="/main-page" className="quick-action-link">
+                <BarChart3 className="quick-action-icon" />
+                <span>View Heatmap</span>
+              </a>
+              <button className="quick-action-link" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                <TrendingUp className="quick-action-icon" />
+                <span>Top of Form</span>
+              </button>
             </div>
-            {/* <div className="sidebar-menu-item"> */}
-              {/* <TrendingUp className="sidebar-menu-icon" /> */}
-              {/* <span>Settings</span> */}
-            {/* </div> */}
-          </nav>
+          </div>
+
+          {/* Help Section */}
+          <div className="sidebar-section">
+            <h3 className="sidebar-section-title">Need Help?</h3>
+            <div className="help-content">
+              <p className="help-text">Your feedback helps improve our community. Be honest and specific about your experience.</p>
+              <div className="help-tips">
+                <div className="tip-item">
+                  <span className="tip-icon">💡</span>
+                  <span className="tip-text">Select your current mood</span>
+                </div>
+                <div className="tip-item">
+                  <span className="tip-icon">💡</span>
+                  <span className="tip-text">Explain what's happening</span>
+                </div>
+                <div className="tip-item">
+                  <span className="tip-icon">💡</span>
+                  <span className="tip-text">Choose your suburb</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </aside>
 
         {/* Main Content Area */}
@@ -203,11 +216,24 @@ export default function FeedbackPage() {
               <h1 className="page-main-title">Community Feedback</h1>
               <p className="page-subtitle">Share your thoughts and help improve our community</p>
             </div>
-            <Button className="submit-feedback-button">
-              <MessageSquare className="button-icon" />
-              Submit Feedback
-            </Button>
+            <div className="header-buttons">
+              <a href="/main-page" className="back-to-main-button">
+                <BarChart3 className="button-icon" />
+                Back to Heatmap
+              </a>
+              <Button className="submit-feedback-button">
+                <MessageSquare className="button-icon" />
+                Submit Feedback
+              </Button>
+            </div>
           </header>
+
+          {/* Submit Message Display */}
+          {submitMessage && (
+            <div className={`submit-message ${submitMessage.type}`}>
+              {submitMessage.text}
+            </div>
+          )}
 
           {/* Content Grid Layout */}
           <div className="content-grid-layout">
@@ -247,7 +273,7 @@ export default function FeedbackPage() {
                     </Select>
                   </div>
 
-                  {/* Question 2: Why reason (Vietnamese) */}
+                  {/* Question 2: Why reason */}
                   <div className="form-field-group">
                     <Label htmlFor="reason-textarea" className="form-field-label">
                       Why so? 
@@ -294,9 +320,13 @@ export default function FeedbackPage() {
                   </div>
 
                   {/* Submit Button */}
-                  <Button type="submit" className="form-submit-button">
+                  <Button 
+                    type="submit" 
+                    className="form-submit-button"
+                    disabled={isSubmitting}
+                  >
                     <MessageSquare className="button-icon" />
-                    Submit Feedback
+                    {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
                   </Button>
                 </form>
               </CardContent>
