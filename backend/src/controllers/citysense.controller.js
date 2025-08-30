@@ -2,7 +2,8 @@ const catchAsync = require('../utils/catchAsync');
 const weatherService = require('../services/weather.service');
 const pollutionService = require('../services/pollution.service');
 const UserMood = require('../models/userMood.model');
-// const { get } = require('mongoose');
+const Mood = require('../models/mood.model');
+
 
 const getWeather = catchAsync(async (req, res) => {
     const suburb = req.query.suburb || 'Sydney';
@@ -28,8 +29,6 @@ const submitMoodForm = catchAsync(async (req, res) => {
     const { selectedMood, reasonText, selectedSuburb } = req.body;
 
     console.log('Received data:', req.body);
-    console.log('selectedMood:', selectedMood);
-    console.log('selectedSuburb:', selectedSuburb);
 
     if(!selectedMood || !selectedSuburb ) {
         return res.status(400).json({
@@ -38,13 +37,15 @@ const submitMoodForm = catchAsync(async (req, res) => {
         })
     }
 
-    const moodEntry = await UserMood.create({
+    const moodEntry = await Mood.create({
         suburb: selectedSuburb,
         user_mood: selectedMood,
-        explaination: reasonText || "",
+        explaination: reasonText,
         timestamp: new Date()
     });
 
+    console.log('Mood data saved to SQLite:', moodEntry.dataValues);
+    console.log('Explaination: ', moodEntry.explaination)
     res.status(201).json({
         success: true,
         message: 'Mood feedback submitted successfully!',
@@ -52,7 +53,9 @@ const submitMoodForm = catchAsync(async (req, res) => {
             id: moodEntry.id,
             suburb: moodEntry.suburb,
             mood: moodEntry.user_mood,
+            explaination: moodEntry.reasonText,
             timestamp: moodEntry.timestamp
+
         }
     });
 });

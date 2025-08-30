@@ -7,9 +7,12 @@ const morgan = require('./config/morgan');
 const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
+const { initializeDatabase } = require('./config/database');
+
+// Initialize SQLite database
+initializeDatabase();
+
 // const mongoose = require('mongoose');
-
-
 // mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
 //   console.log('Connected to MongoDB');
 // });
