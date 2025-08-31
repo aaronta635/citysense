@@ -814,6 +814,17 @@
   margin-bottom: 8px;
   font-size: 13px;
   color: #666;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #e9ecef;
+  transition: all 0.2s;
+}
+
+.legendItem:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #15bd69;
+  transform: translateX(2px);
 }
 
 .colorDot {
@@ -923,6 +934,8 @@
 .legendColor.angry { background-color: #f44336; }
 .legendColor.sad { background-color: #9c27b0; }
 .legendColor.stressed { background-color: #9e9e9e; }
+.legendColor.complaints { background-color: #f44336; }
+.legendColor.positives { background-color: #4caf50; }
 
 /* Activity dot colors */
 .activityDot.blue { background-color: #2196f3; }
@@ -974,6 +987,14 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 15px;
+}
+
+.aiAnalysisSection h4 {
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 15px 0;
+  text-align: center;
 }
 
 .suburbAnalysis {
@@ -1030,4 +1051,141 @@
   line-height: 1.3;
   color: #333;
   font-style: italic;
+}
+
+/* Loading and No Data States */
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.noDataState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #999;
+  font-size: 14px;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Compact AI Analysis Styles for Sidebar */
+.compactPieChartContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.compactPieChart {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  border: 3px solid #ffffff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: all 0.3s ease;
+}
+
+.compactPieChart:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.compactLegend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.compactLegendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #ffffff;
+  border-radius: 8px;
+  border-left: 4px solid transparent;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.compactLegendItem:hover {
+  background: #f8f9fa;
+  transform: translateX(3px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border-left-color: #667eea;
+}
+
+.compactLegendColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.compactLegendText {
+  font-size: 11px;
+  color: #495057;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* Enhanced AI Analysis Section with distinct colors */
+.aiAnalysisPanel {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #dee2e6;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 8px rgba(102, 126, 234, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.aiAnalysisPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.aiAnalysisPanel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.aiAnalysisPanel h3 {
+  color: #495057;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  text-align: center;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

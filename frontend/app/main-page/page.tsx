@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import { GOOGLE_MAPS_API_KEY } from "./config";
 import { Users, Heart, MessageSquare, TrendingUp, LogOut } from "lucide-react";
+import { apiService, SuburbAnalysis } from "./services/api";
 
 const SYDNEY_CENTER = { lat: -33.8688, lng: 151.2093 };
 const SYDNEY_BOUNDS = {
@@ -78,49 +79,8 @@ export default function SydneySensePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
 
-  // Mock AI analysis data (replace with actual API call later)
-  const mockAIAnalysis = {
-    "Bondi": {
-      "complaints": {
-        "Weather": 1
-      },
-      "positives": {},
-      "newsfeed": [
-        "Bondi Beach Weather Disappoints Despite Good Air Quality"
-      ]
-    },
-    "Sydney": {
-      "complaints": {},
-      "positives": {
-        "Weather": 1
-      },
-      "newsfeed": [
-        "Sunny Sydney Enjoys Beautiful Weather and Great Air Quality Today!"
-      ]
-    },
-    "Parramatta": {
-      "complaints": {
-        "Traffic": 2,
-        "Noise": 1
-      },
-      "positives": {
-        "Community": 1
-      },
-      "newsfeed": [
-        "Parramatta Traffic Woes Continue, But Community Spirit Shines Through"
-      ]
-    },
-    "Manly": {
-      "complaints": {},
-      "positives": {
-        "Weather": 1,
-        "Beach": 1
-      },
-      "newsfeed": [
-        "Manly Beach Perfect for Surfing Today - Great Weather and Clean Air!"
-      ]
-    }
-  };
+  const [aiAnalysis, setAiAnalysis] = useState<SuburbAnalysis>({});
+  const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
 
   const mapRef = useRef<HTMLDivElement>(null);
 
@@ -137,6 +97,48 @@ export default function SydneySensePage() {
       router.push('/login');
     }
   }, [router]);
+
+  // Fetch AI analysis data when component mounts
+  useEffect(() => {
+    const fetchAnalysisData = async () => {
+      if (isAuthenticated) {
+        setIsAnalysisLoading(true);
+        try {
+          // First try to get stored analysis data (faster)
+          const storedAnalysis = await apiService.getAllStoredAnalysis();
+          if (storedAnalysis && storedAnalysis.length > 0) {
+            // Convert stored analysis to the format expected by the UI
+            const analysisMap: SuburbAnalysis = {};
+            storedAnalysis.forEach(analysis => {
+              analysisMap[analysis.suburb] = {
+                complaints: analysis.complaints,
+                positives: analysis.positives,
+                newsfeed: analysis.newsfeed
+              };
+            });
+            setAiAnalysis(analysisMap);
+          } else {
+            // Fallback to live analysis if no stored data
+            const analysisData = await apiService.getAnalysisForAll();
+            setAiAnalysis(analysisData);
+          }
+        } catch (error) {
+          console.error('Error fetching analysis data:', error);
+          // Fallback to live analysis on error
+          try {
+            const analysisData = await apiService.getAnalysisForAll();
+            setAiAnalysis(analysisData);
+          } catch (fallbackError) {
+            console.error('Fallback analysis also failed:', fallbackError);
+          }
+        } finally {
+          setIsAnalysisLoading(false);
+        }
+      }
+    };
+
+    fetchAnalysisData();
+  }, [isAuthenticated]);
 
   // Handle logout
   const handleLogout = () => {
@@ -1257,41 +1259,268 @@ export default function SydneySensePage() {
     let currentAngle = 0;
     const segments = [];
 
+    // Use different shades for each mood type
+    const moodColors = {
+      happy: ['#4caf50', '#388e3c', '#2e7d32'],
+      neutral: ['#ffeb3b', '#fbc02d', '#f57f17'],
+      angry: ['#f44336', '#d32f2f', '#c62828'],
+      sad: ['#9c27b0', '#7b1fa2', '#6a1b9a'],
+      stressed: ['#9e9e9e', '#757575', '#616161']
+    };
+
     if (happyPercent > 0) {
       segments.push(
-        `#4caf50 ${currentAngle}deg ${currentAngle + happyPercent * 3.6}deg`
+        `${moodColors.happy[0]} ${currentAngle}deg ${currentAngle + happyPercent * 3.6}deg`
       );
       currentAngle += happyPercent * 3.6;
     }
 
     if (neutralPercent > 0) {
       segments.push(
-        `#ffeb3b ${currentAngle}deg ${currentAngle + neutralPercent * 3.6}deg`
+        `${moodColors.neutral[0]} ${currentAngle}deg ${currentAngle + neutralPercent * 3.6}deg`
       );
       currentAngle += neutralPercent * 3.6;
     }
 
     if (angryPercent > 0) {
       segments.push(
-        `#f44336 ${currentAngle}deg ${currentAngle + angryPercent * 3.6}deg`
+        `${moodColors.angry[0]} ${currentAngle}deg ${currentAngle + angryPercent * 3.6}deg`
       );
       currentAngle += angryPercent * 3.6;
     }
 
     if (sadPercent > 0) {
       segments.push(
-        `#9c27b0 ${currentAngle}deg ${currentAngle + sadPercent * 3.6}deg`
+        `${moodColors.sad[0]} ${currentAngle}deg ${currentAngle + sadPercent * 3.6}deg`
       );
       currentAngle += sadPercent * 3.6;
     }
 
     if (stressedPercent > 0) {
       segments.push(
-        `#9e9e9e ${currentAngle}deg ${currentAngle + stressedPercent * 3.6}deg`
+        `${moodColors.stressed[0]} ${currentAngle}deg ${currentAngle + stressedPercent * 3.6}deg`
       );
     }
 
     return segments.join(", ");
+  };
+
+  // AI Analysis Pie Chart Functions - Detailed Breakdown
+  const getAIAnalysisPieChartGradient = () => {
+    // Collect all unique complaint and positive types
+    const complaintTypes = new Map();
+    const positiveTypes = new Map();
+    
+    Object.values(aiAnalysis).forEach(analysis => {
+      Object.entries(analysis.complaints).forEach(([type, count]) => {
+        complaintTypes.set(type, (complaintTypes.get(type) || 0) + count);
+      });
+      Object.entries(analysis.positives).forEach(([type, count]) => {
+        positiveTypes.set(type, (positiveTypes.get(type) || 0) + count);
+      });
+    });
+
+    const total = Array.from(complaintTypes.values()).reduce((a, b) => a + b, 0) + 
+                  Array.from(positiveTypes.values()).reduce((a, b) => a + b, 0);
+    
+    if (total === 0) return "";
+
+    let currentAngle = 0;
+    const segments = [];
+    
+    // Add complaint types with different shades of red
+    const complaintColors = ['#f44336', '#d32f2f', '#c62828', '#b71c1c', '#8d0000'];
+    let colorIndex = 0;
+    
+    for (const [type, count] of complaintTypes) {
+      const percent = (count / total) * 100;
+      if (percent > 0) {
+        segments.push(
+          `${complaintColors[colorIndex % complaintColors.length]} ${currentAngle}deg ${currentAngle + percent * 3.6}deg`
+        );
+        currentAngle += percent * 3.6;
+        colorIndex++;
+      }
+    }
+    
+    // Add positive types with different shades of green
+    const positiveColors = ['#4caf50', '#388e3c', '#2e7d32', '#1b5e20', '#0d4f14'];
+    colorIndex = 0;
+    
+    for (const [type, count] of positiveTypes) {
+      const percent = (count / total) * 100;
+      if (percent > 0) {
+        segments.push(
+          `${positiveColors[colorIndex % positiveColors.length]} ${currentAngle}deg ${currentAngle + percent * 3.6}deg`
+        );
+        currentAngle += percent * 3.6;
+        colorIndex++;
+      }
+    }
+
+    return segments.join(", ");
+  };
+
+  const getOverallComplaintsPercentage = () => {
+    const totalComplaints = Object.values(aiAnalysis).reduce(
+      (sum, analysis) => sum + Object.values(analysis.complaints).reduce((a, b) => a + b, 0),
+      0
+    );
+    
+    const totalPositives = Object.values(aiAnalysis).reduce(
+      (sum, analysis) => sum + Object.values(analysis.positives).reduce((a, b) => a + b, 0),
+      0
+    );
+
+    const total = totalComplaints + totalPositives;
+    return total > 0 ? Math.round((totalComplaints / total) * 100) : 0;
+  };
+
+  const getOverallPositivesPercentage = () => {
+    const totalComplaints = Object.values(aiAnalysis).reduce(
+      (sum, analysis) => sum + Object.values(analysis.complaints).reduce((a, b) => a + b, 0),
+      0
+    );
+    
+    const totalPositives = Object.values(aiAnalysis).reduce(
+      (sum, analysis) => sum + Object.values(analysis.positives).reduce((a, b) => a + b, 0),
+      0
+    );
+
+    const total = totalComplaints + totalPositives;
+    return total > 0 ? Math.round((totalPositives / total) * 100) : 0;
+  };
+
+  const getDetailedAIAnalysisLegend = () => {
+    // Collect all unique types
+    const complaintTypes = new Map();
+    const positiveTypes = new Map();
+    
+    Object.values(aiAnalysis).forEach(analysis => {
+      Object.entries(analysis.complaints).forEach(([type, count]) => {
+        complaintTypes.set(type, (complaintTypes.get(type) || 0) + count);
+      });
+      Object.entries(analysis.positives).forEach(([type, count]) => {
+        positiveTypes.set(type, (positiveTypes.get(type) || 0) + count);
+      });
+    });
+
+    const total = Array.from(complaintTypes.values()).reduce((a, b) => a + b, 0) + 
+                  Array.from(positiveTypes.values()).reduce((a, b) => a + b, 0);
+
+    if (total === 0) {
+      return <div className={styles.noDataState}>No analysis data available</div>;
+    }
+
+    const legendItems = [];
+
+    // Add complaint types
+    const complaintColors = ['#f44336', '#d32f2f', '#c62828', '#b71c1c', '#8d0000'];
+    let colorIndex = 0;
+    
+    for (const [type, count] of complaintTypes) {
+      const percent = Math.round((count / total) * 100);
+      if (percent > 0) {
+        legendItems.push(
+          <div key={`complaint-${type}`} className={styles.legendItem}>
+            <div 
+              className={styles.legendColor} 
+              style={{ backgroundColor: complaintColors[colorIndex % complaintColors.length] }}
+            ></div>
+            <span>{type} (Complaints): {percent}%</span>
+          </div>
+        );
+        colorIndex++;
+      }
+    }
+    
+    // Add positive types
+    const positiveColors = ['#4caf50', '#388e3c', '#2e7d32', '#1b5e20', '#0d4f14'];
+    colorIndex = 0;
+    
+    for (const [type, count] of positiveTypes) {
+      const percent = Math.round((count / total) * 100);
+      if (percent > 0) {
+        legendItems.push(
+          <div key={`positive-${type}`} className={styles.legendItem}>
+            <div 
+              className={styles.legendColor} 
+              style={{ backgroundColor: positiveColors[colorIndex % positiveColors.length] }}
+            ></div>
+            <span>{type} (Positives): {percent}%</span>
+          </div>
+        );
+        colorIndex++;
+      }
+    }
+
+    return legendItems;
+  };
+
+  const getDetailedMoodLegend = () => {
+    const totalSubmissions = suburbData.reduce(
+      (sum, suburb) => sum + suburb.moodBreakdown.totalSubmissions,
+      0
+    );
+
+    if (totalSubmissions === 0) {
+      return <div className={styles.noDataState}>No mood data available</div>;
+    }
+
+    let totalHappy = 0;
+    let totalNeutral = 0;
+    let totalAngry = 0;
+    let totalSad = 0;
+    let totalStressed = 0;
+
+    suburbData.forEach((suburb) => {
+      totalHappy +=
+        (suburb.moodBreakdown.happy / 100) *
+        suburb.moodBreakdown.totalSubmissions;
+      totalNeutral +=
+        (suburb.moodBreakdown.neutral / 100) *
+        suburb.moodBreakdown.totalSubmissions;
+      totalAngry +=
+        (suburb.moodBreakdown.angry / 100) *
+        suburb.moodBreakdown.totalSubmissions;
+      totalSad +=
+        (suburb.moodBreakdown.sad / 100) *
+        suburb.moodBreakdown.totalSubmissions;
+      totalStressed +=
+        (suburb.moodBreakdown.stressed / 100) *
+        suburb.moodBreakdown.totalSubmissions;
+    });
+
+    const happyPercent = Math.round((totalHappy / totalSubmissions) * 100);
+    const neutralPercent = Math.round((totalNeutral / totalSubmissions) * 100);
+    const angryPercent = Math.round((totalAngry / totalSubmissions) * 100);
+    const sadPercent = Math.round((totalSad / totalSubmissions) * 100);
+    const stressedPercent = Math.round((totalStressed / totalSubmissions) * 100);
+
+    return (
+      <>
+        <div className={styles.legendItem}>
+          <div className={`${styles.legendColor} ${styles.happy}`}></div>
+          <span>Happy: {happyPercent}% ({totalHappy} submissions)</span>
+        </div>
+        <div className={styles.legendItem}>
+          <div className={`${styles.legendColor} ${styles.neutral}`}></div>
+          <span>Neutral: {neutralPercent}% ({totalNeutral} submissions)</span>
+        </div>
+        <div className={styles.legendItem}>
+          <div className={`${styles.legendColor} ${styles.angry}`}></div>
+          <span>Angry: {angryPercent}% ({totalAngry} submissions)</span>
+        </div>
+        <div className={styles.legendItem}>
+          <div className={`${styles.legendColor} ${styles.sad}`}></div>
+          <span>Sad: {sadPercent}% ({totalSad} submissions)</span>
+        </div>
+        <div className={styles.legendItem}>
+          <div className={`${styles.legendColor} ${styles.stressed}`}></div>
+          <span>Stressed: {stressedPercent}% ({totalStressed} submissions)</span>
+        </div>
+      </>
+    );
   };
 
   const validateMoodPercentages = () => {
@@ -1382,7 +1611,7 @@ export default function SydneySensePage() {
     
     if (!aiAnalysisElement || !aiAnalysisContent) return;
     
-    const analysis = mockAIAnalysis[suburbName as keyof typeof mockAIAnalysis];
+    const analysis = aiAnalysis[suburbName as keyof typeof aiAnalysis];
     if (!analysis) return;
     
     // Populate the content
@@ -1438,6 +1667,77 @@ export default function SydneySensePage() {
     };
   }, [searchTimeout]);
 
+  // Compact AI Analysis Legend for Sidebar
+  const getCompactAIAnalysisLegend = () => {
+    // Collect all unique complaint and positive types
+    const complaintTypes = new Map();
+    const positiveTypes = new Map();
+    
+    Object.values(aiAnalysis).forEach(analysis => {
+      Object.entries(analysis.complaints).forEach(([type, count]) => {
+        complaintTypes.set(type, (complaintTypes.get(type) || 0) + count);
+      });
+      Object.entries(analysis.positives).forEach(([type, count]) => {
+        positiveTypes.set(type, (positiveTypes.get(type) || 0) + count);
+      });
+    });
+
+    const total = Array.from(complaintTypes.values()).reduce((a, b) => a + b, 0) + 
+                  Array.from(positiveTypes.values()).reduce((a, b) => a + b, 0);
+
+    if (total === 0) {
+      return <div className={styles.noDataState}>No analysis data</div>;
+    }
+
+    const legendItems = [];
+
+    // Add complaint types with compact display
+    const complaintColors = ['#f44336', '#d32f2f', '#c62828'];
+    let colorIndex = 0;
+    
+    for (const [type, count] of complaintTypes) {
+      const percent = Math.round((count / total) * 100);
+      if (percent > 0) {
+        legendItems.push(
+          <div key={`complaint-${type}`} className={styles.compactLegendItem}>
+            <div 
+              className={styles.compactLegendColor} 
+              style={{ backgroundColor: complaintColors[colorIndex % complaintColors.length] }}
+            ></div>
+            <span className={styles.compactLegendText}>
+              {type}: {percent}%
+            </span>
+          </div>
+        );
+        colorIndex++;
+      }
+    }
+    
+    // Add positive types with compact display
+    const positiveColors = ['#4caf50', '#388e3c', '#2e7d32'];
+    colorIndex = 0;
+    
+    for (const [type, count] of positiveTypes) {
+      const percent = Math.round((count / total) * 100);
+      if (percent > 0) {
+        legendItems.push(
+          <div key={`positive-${type}`} className={styles.compactLegendItem}>
+            <div 
+              className={styles.compactLegendColor} 
+              style={{ backgroundColor: positiveColors[colorIndex % positiveColors.length] }}
+            ></div>
+            <span className={styles.compactLegendText}>
+              {type}: {percent}%
+            </span>
+          </div>
+        );
+        colorIndex++;
+      }
+    }
+
+    return legendItems;
+  };
+
   return (
     <div className={styles.dashboard}>
       {/* Google Maps Script */}
@@ -1486,27 +1786,33 @@ export default function SydneySensePage() {
               <div className={styles.dropdownHeader}>
                 <h4>Recent Activity</h4>
                 <span className={styles.activityCount}>
-                  {Object.values(mockAIAnalysis).reduce((total, analysis) => total + analysis.newsfeed.length, 0)} new
+                  {Object.values(aiAnalysis).reduce((total, analysis) => total + analysis.newsfeed.length, 0)} new
                 </span>
               </div>
 
               <div className={styles.dropdownActivities}>
-                {Object.entries(mockAIAnalysis).map(([suburbName, analysis]) => 
-                  analysis.newsfeed.map((news, index) => (
-                    <div key={`${suburbName}-${index}`} className={styles.dropdownActivityItem}>
-                      <div
-                        className={`${styles.activityDot} ${styles.blue}`}
-                      ></div>
-                      <div className={styles.dropdownActivityContent}>
-                        <div className={styles.dropdownActivityText}>
-                          {news}
-                        </div>
-                        <div className={styles.dropdownActivityTime}>
-                          {suburbName} • Just now
+                {isAnalysisLoading ? (
+                  <div className={styles.loadingState}>Loading analysis data...</div>
+                ) : Object.keys(aiAnalysis).length === 0 ? (
+                  <div className={styles.noDataState}>No analysis data available</div>
+                ) : (
+                  Object.entries(aiAnalysis).map(([suburbName, analysis]) => 
+                    analysis.newsfeed.map((news, index) => (
+                      <div key={`${suburbName}-${index}`} className={styles.dropdownActivityItem}>
+                        <div
+                          className={`${styles.activityDot} ${styles.blue}`}
+                        ></div>
+                        <div className={styles.dropdownActivityContent}>
+                          <div className={styles.dropdownActivityText}>
+                            {news}
+                          </div>
+                          <div className={styles.dropdownActivityTime}>
+                            {suburbName} • Just now
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))
+                    ))
+                  )
                 )}
               </div>
 
@@ -1984,6 +2290,22 @@ export default function SydneySensePage() {
           </div>
         </div>
 
+        {/* AI Analysis Distribution - Compact Sidebar Version */}
+        <div className={`${styles.panelSection} ${styles.aiAnalysisPanel}`}>
+          <h3>AI Analysis Distribution</h3>
+          <div className={styles.compactPieChartContainer}>
+            <div
+              className={styles.compactPieChart}
+              style={{
+                background: `conic-gradient(${getAIAnalysisPieChartGradient()})`,
+              }}
+            />
+          </div>
+          <div className={styles.compactLegend}>
+            {getCompactAIAnalysisLegend()}
+          </div>
+        </div>
+
         {/* Top 3 Suburbs Ranking Chart */}
         <div className={styles.panelSection}>
           <h3>Top 3 Suburbs by Happy Mood</h3>
@@ -2063,31 +2385,10 @@ export default function SydneySensePage() {
               </div>
             </div>
 
+
+
             <div className={styles.moodLegend}>
-              <div className={styles.legendItem}>
-                <div className={`${styles.legendColor} ${styles.happy}`}></div>
-                <span>Happy: {getOverallMoodPercentage("happy")}%</span>
-              </div>
-              <div className={styles.legendItem}>
-                <div
-                  className={`${styles.legendColor} ${styles.neutral}`}
-                ></div>
-                <span>Neutral: {getOverallMoodPercentage("neutral")}%</span>
-              </div>
-              <div className={styles.legendItem}>
-                <div className={`${styles.legendColor} ${styles.angry}`}></div>
-                <span>Angry: {getOverallMoodPercentage("angry")}%</span>
-              </div>
-              <div className={styles.legendItem}>
-                <div className={`${styles.legendColor} ${styles.sad}`}></div>
-                <span>Sad: {getOverallMoodPercentage("sad")}%</span>
-              </div>
-              <div className={styles.legendItem}>
-                <div
-                  className={`${styles.legendColor} ${styles.stressed}`}
-                ></div>
-                <span>Stressed: {getOverallMoodPercentage("stressed")}%</span>
-              </div>
+              {getDetailedMoodLegend()}
             </div>
           </div>
         )}
