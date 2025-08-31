@@ -78,6 +78,50 @@ export default function SydneySensePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
 
+  // Mock AI analysis data (replace with actual API call later)
+  const mockAIAnalysis = {
+    "Bondi": {
+      "complaints": {
+        "Weather": 1
+      },
+      "positives": {},
+      "newsfeed": [
+        "Bondi Beach Weather Disappoints Despite Good Air Quality"
+      ]
+    },
+    "Sydney": {
+      "complaints": {},
+      "positives": {
+        "Weather": 1
+      },
+      "newsfeed": [
+        "Sunny Sydney Enjoys Beautiful Weather and Great Air Quality Today!"
+      ]
+    },
+    "Parramatta": {
+      "complaints": {
+        "Traffic": 2,
+        "Noise": 1
+      },
+      "positives": {
+        "Community": 1
+      },
+      "newsfeed": [
+        "Parramatta Traffic Woes Continue, But Community Spirit Shines Through"
+      ]
+    },
+    "Manly": {
+      "complaints": {},
+      "positives": {
+        "Weather": 1,
+        "Beach": 1
+      },
+      "newsfeed": [
+        "Manly Beach Perfect for Surfing Today - Great Weather and Clean Air!"
+      ]
+    }
+  };
+
   const mapRef = useRef<HTMLDivElement>(null);
 
   // Check authentication on component mount
@@ -702,11 +746,15 @@ export default function SydneySensePage() {
       map.setCenter(suburb.center);
       map.setZoom(16);
       showMoodBreakdown(suburb);
+      
+      // Show AI analysis for the selected suburb
+      showAIAnalysis(selectedSuburb);
     } else if (selectedSuburb === "all" && map) {
       console.log("Returning to all suburbs view");
       map.setCenter(SYDNEY_CENTER);
       map.setZoom(14);
       hideMoodBreakdown();
+      hideAIAnalysis();
     }
 
     // Update stats
@@ -1318,9 +1366,67 @@ export default function SydneySensePage() {
       // Hide mood breakdown
       hideMoodBreakdown();
       
+      // Hide AI analysis
+      hideAIAnalysis();
+      
       // Update stats
       const totalSentiment = suburbData.reduce((sum, suburb) => sum + suburb.sentiment, 0);
       updateFilterStats(suburbData.length, totalSentiment, suburbData.length);
+    }
+  };
+
+  // Show AI analysis for specific suburb
+  const showAIAnalysis = (suburbName: string) => {
+    const aiAnalysisElement = document.getElementById("aiAnalysis");
+    const aiAnalysisContent = document.getElementById("aiAnalysisContent");
+    
+    if (!aiAnalysisElement || !aiAnalysisContent) return;
+    
+    const analysis = mockAIAnalysis[suburbName as keyof typeof mockAIAnalysis];
+    if (!analysis) return;
+    
+    // Populate the content
+    aiAnalysisContent.innerHTML = `
+      <div class="${styles.suburbAnalysis}">
+        <h4 class="${styles.suburbAnalysisTitle}">${suburbName}</h4>
+        
+        <div class="${styles.analysisItem}">
+          <span class="${styles.analysisLabel}">Positives:</span>
+          <span class="${styles.analysisValue}">
+            ${Object.keys(analysis.positives).length > 0 
+              ? Object.entries(analysis.positives).map(([key, value]) => `${key}: ${value}`).join(', ')
+              : 'None'
+            }
+          </span>
+        </div>
+
+        <div class="${styles.analysisItem}">
+          <span class="${styles.analysisLabel}">Complaints:</span>
+          <span class="${styles.analysisValue}">
+            ${Object.keys(analysis.complaints).length > 0 
+              ? Object.entries(analysis.complaints).map(([key, value]) => `${key}: ${value}`).join(', ')
+              : 'None'
+            }
+          </span>
+        </div>
+      </div>
+    `;
+    
+    // Show the element
+    aiAnalysisElement.style.display = "block";
+    setTimeout(() => {
+      aiAnalysisElement.style.opacity = "1";
+    }, 10);
+  };
+
+  // Hide AI analysis
+  const hideAIAnalysis = () => {
+    const aiAnalysisElement = document.getElementById("aiAnalysis");
+    if (aiAnalysisElement) {
+      aiAnalysisElement.style.opacity = "0";
+      setTimeout(() => {
+        aiAnalysisElement.style.display = "none";
+      }, 300);
     }
   };
 
@@ -1379,49 +1485,29 @@ export default function SydneySensePage() {
             <div className={styles.dropdownMenu}>
               <div className={styles.dropdownHeader}>
                 <h4>Recent Activity</h4>
-                <span className={styles.activityCount}>3 new</span>
+                <span className={styles.activityCount}>
+                  {Object.values(mockAIAnalysis).reduce((total, analysis) => total + analysis.newsfeed.length, 0)} new
+                </span>
               </div>
 
               <div className={styles.dropdownActivities}>
-                <div className={styles.dropdownActivityItem}>
-                  <div
-                    className={`${styles.activityDot} ${styles.green}`}
-                  ></div>
-                  <div className={styles.dropdownActivityContent}>
-                    <div className={styles.dropdownActivityText}>
-                      New positive feedback in Circular Quay area
+                {Object.entries(mockAIAnalysis).map(([suburbName, analysis]) => 
+                  analysis.newsfeed.map((news, index) => (
+                    <div key={`${suburbName}-${index}`} className={styles.dropdownActivityItem}>
+                      <div
+                        className={`${styles.activityDot} ${styles.blue}`}
+                      ></div>
+                      <div className={styles.dropdownActivityContent}>
+                        <div className={styles.dropdownActivityText}>
+                          {news}
+                        </div>
+                        <div className={styles.dropdownActivityTime}>
+                          {suburbName} • Just now
+                        </div>
+                      </div>
                     </div>
-                    <div className={styles.dropdownActivityTime}>
-                      2 minutes ago
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.dropdownActivityItem}>
-                  <div
-                    className={`${styles.activityDot} ${styles.yellow}`}
-                  ></div>
-                  <div className={styles.dropdownActivityContent}>
-                    <div className={styles.dropdownActivityText}>
-                      Neutral sentiment spike in Woolloomooloo area
-                    </div>
-                    <div className={styles.dropdownActivityTime}>
-                      15 minutes ago
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.dropdownActivityItem}>
-                  <div className={`${styles.activityDot} ${styles.red}`}></div>
-                  <div className={styles.dropdownActivityContent}>
-                    <div className={styles.dropdownActivityText}>
-                      Concerns raised about traffic in Homebush area
-                    </div>
-                    <div className={styles.dropdownActivityTime}>
-                      1 hour ago
-                    </div>
-                  </div>
-                </div>
+                  ))
+                )}
               </div>
 
               <div className={styles.dropdownFooter}>
@@ -1729,6 +1815,18 @@ export default function SydneySensePage() {
           <div className={styles.totalSubmissions}>
             <span>Total Submissions: </span>
             <span id="totalSubmissions">0</span>
+          </div>
+        </div>
+
+        {/* AI Analysis Section */}
+        <div
+          className={styles.aiAnalysisSection}
+          id="aiAnalysis"
+          style={{ display: "none", opacity: "0" }}
+        >
+          <h3>AI Community Analysis</h3>
+          <div id="aiAnalysisContent">
+            {/* Content will be populated dynamically */}
           </div>
         </div>
       </aside>
